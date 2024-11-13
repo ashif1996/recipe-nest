@@ -1,0 +1,18 @@
+{
+  "name": "recipe-nest",
+  "version": "1.0.0",
+  "description": "RecipeNest is a platform for sharing and discovering delicious recipes. Users can add, browse, and organize recipes by category, with options to save favorites and rate dishes. Whether you're a seasoned chef or a beginner, RecipeNest helps you find your next culinary adventure.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "Ashif Hassan",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7"
+  }
+}
