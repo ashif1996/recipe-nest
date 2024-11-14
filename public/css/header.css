@@ -16,6 +16,19 @@
     padding: 15px 0;
     transition: all 0.3s ease-in-out;
   }
+
+  .app-name {
+    font-size: 28px;
+    font-weight: bold;
+    color: lightseagreen;
+    letter-spacing: 1.5px;
+    transition: color 0.3s ease;
+}
+
+.app-name:hover {
+    color: #85FF00;
+}
+
   
   #sticky-header {
     position: sticky;
@@ -139,5 +152,33 @@
       flex-direction: column;
       gap: 20px;
     }
+  }
+
+  .line_btn {
+    display: inline-block;
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    border: 2px solid transparent;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    letter-spacing: 1px;
+  }
+  
+  .line_btn:hover {
+    background: #fff;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    color: #2980b9;
+    border-color: #2980b9;
+  }
+  
+  .line_btn:focus, .line_btn:active {
+    outline: none;
+    box-shadow: 0 0 5px 3px rgba(41, 128, 185, 0.5);
   }
   
