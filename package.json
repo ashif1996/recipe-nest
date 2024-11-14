@@ -12,7 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.21.1",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.18.1",
+    "nocache": "^4.0.0",
     "nodemon": "^3.1.7"
   }
 }
