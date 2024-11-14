@@ -20,12 +20,11 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(expressLayouts);
-app.set('views', path.join(__dirname, "views"));
-app.set('view engine', "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 app.use(nocache());
 
-const indexRoutes = require('./routes/indexRoutes');
-const { title } = require('process');
+const indexRoutes = require("./routes/indexRoutes");
 app.use(indexRoutes);
 
 app.use((req, res, next) => {
