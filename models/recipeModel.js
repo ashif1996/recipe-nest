@@ -11,10 +11,17 @@ const recipeSchema = new Schema({
         type: String,
         required: true,
         trim: true,
+        maxlength: 50,
     },
     image: {
         type: String,
         required: true,
+        validate: {
+            validator: (img) => {
+                return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(img);
+            },
+            message: "Invalid image URL format",
+        },
     },
     preparationTime: {
         type: String,
@@ -24,13 +31,25 @@ const recipeSchema = new Schema({
         type: String,
         required: true,
     },
-    ingrediants: {
+    ingredients: {
         type: [String],
         required: true,
+        validate: {
+            validator : (val) => {
+                return val.length > 0;
+            },
+            message: "Ingrediants cannot be empty",
+        },
     },
     steps: {
         type: [String],
         required: true,
+        validate: {
+            validator : (val) => {
+                return val.length > 0;
+            },
+            message: "Steps cannot be empty",
+        },
     },
     similarRecipes: [
         {

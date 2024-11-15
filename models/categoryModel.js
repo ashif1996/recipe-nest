@@ -6,15 +6,23 @@ const categorySchema = new Schema({
         type: String,
         required: true,
         trim: true,
+        maxlength: 50,
     },
     description: {
         type: String,
         required: true,
         trim: true,
+        maxlength: 300,
     },
     image: {
         type: String,
         required: true,
+        validate: {
+            validator: (img) => {
+                return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(img);
+            },
+            message: "Invalid image URL format",
+        },
     },
     createdAt: {
         type: Date,
