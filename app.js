@@ -25,7 +25,10 @@ app.set("view engine", "ejs");
 app.use(nocache());
 
 const indexRoutes = require("./routes/indexRoutes");
-app.use(indexRoutes);
+const userRoutes = require("./routes/userRoutes");
+
+app.use("/", indexRoutes);
+app.use("/users", userRoutes);
 
 app.use((req, res, next) => {
     const locals = { title: "404 | Page Not Found" };
