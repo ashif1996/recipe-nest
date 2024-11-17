@@ -29,7 +29,6 @@
 
 .login_form_inner h3 {
     color: #222222;
-    text-transform: uppercase;
     font-size: 24px; /* Clearer heading size */
     margin-bottom: 20px;
 }
@@ -132,4 +131,52 @@
     .login_form_inner .form-group input {
         font-size: 14px;
     }
+}
+
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Adjust as needed */
+    background-color: #f8f9fa;
+}
+.signup-form {
+    max-width: 600px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.btn-send-otp,
+.btn-verify-otp {
+    background-color: #2980b9;
+    color: white;
+}
+.btn-send-otp:hover,
+.btn-verify-otp:hover {
+    background-color: white;
+    color: #2980b9;
+    border: 2px solid #2980b9;
+}
+.timer {
+    flex: 1; /* Take up remaining space */
+    margin-left: 10px;
+}
+.resend-otp-link {
+    margin-left: auto; /* Push to the right end */
+    margin-right: 10px;
+}
+.resend-otp-link a {
+    color: #007bff;
+}
+.resend-otp-link a:hover {
+    text-decoration: underline !important;
+}
+.already-account {
+    text-align: center;
+    margin-top: 20px;
+}
+.already-account .already-account-underline:hover {
+    text-decoration: underline !important;
 }

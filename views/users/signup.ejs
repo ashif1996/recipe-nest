@@ -1,0 +1,51 @@
+<div class="signup-container">
+    <div class="signup-form">
+        <h2 class="text-center mb-4">Sign Up</h2>
+        <form action="/users/signup" method="post" id="signupForm">
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="text" class="form-control mb-3" id="firstName" name="firstName" placeholder="First Name">
+                    <span id="firstNameError" class="error-message"></span>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control mb-3" id="lastName" name="lastName" placeholder="Last Name">
+                    <span id="lastNameError" class="error-message"></span>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <div class="input-group">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
+                    <button type="button" class="btn btn-send-otp" id="sendOtpBtn">Send OTP</button>
+                </div>
+                <span id="emailError" class="error-message"></span>
+            </div>
+            <div id="otpSection" style="display: none;">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="otp" placeholder="Verify OTP">
+                    <button type="button" class="btn btn-verify-otp" id="verifyOtpBtn">Verify OTP</button>
+                </div>
+                <span id="otpError" class="error-message"></span>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="timer"></div>
+                    <div class="resend-otp-link">
+                        <a href="#" id="signupResendOtpLink">Resend OTP</a>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <input type="password" class="form-control mb-3" id="password" name="password" placeholder="Password">
+                <span id="passwordError" class="error-message"></span>
+            </div>
+            <div class="form-group mb-3">
+                <input type="password" class="form-control mb-3" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password">
+                <span id="confirmPasswordError" class="error-message"></span>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-signup login-btn" id="signup-btn">Sign Up</button>
+            </div>
+        </form>
+        <div class="already-account">
+            <p>Already have an account? <a href="/users/login" class="already-account-underline">Login</a></p>
+        </div>
+    </div>
+</div>
