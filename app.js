@@ -6,6 +6,7 @@ connectToDatabase();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const flash = require("connect-flash");
 const nocache = require("nocache");
 const expressLayouts = require("express-ejs-layouts");
 const app = express();
@@ -23,12 +24,21 @@ app.use(expressLayouts);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(nocache());
+app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.successMessage = req.flash("success");
+    res.locals.errorMessage = req.flash("error");
+    next();
+});
 
 const indexRoutes = require("./routes/indexRoutes");
 const userRoutes = require("./routes/userRoutes");
+const otpRoutes = require("./routes/otpRoutes");
 
 app.use("/", indexRoutes);
 app.use("/users", userRoutes);
+app.use("/otp", otpRoutes);
 
 app.use((req, res, next) => {
     const locals = { title: "404 | Page Not Found" };
