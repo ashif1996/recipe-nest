@@ -22,7 +22,7 @@ const userSchema = new Schema({
         lowercase: true,
         validate: {
             validator: (val) => {
-                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
             },
             message: "Invalid email format",
         },
