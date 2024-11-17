@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
+const HttpStatuscode = require("../utils/httpStatusCode");
 
 const getUserLogin = (req, res) => {
     const locals = { title: "User Login | RecipeNest" };
