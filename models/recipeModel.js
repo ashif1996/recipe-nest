@@ -7,7 +7,7 @@ const recipeSchema = new Schema({
         ref: "Category",
         required: true,
     },
-    name: {
+    recipeName: {
         type: String,
         required: true,
         trim: true,
