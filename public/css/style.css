@@ -4,6 +4,17 @@
 .error-message {
   color: red;
 }
+.flash-messages {
+  width: 100%; /* Match the width of the column */
+  margin-bottom: 20px; /* Add some space below */
+}
+
+.alert {
+  margin-bottom: 0; /* Remove default margin */
+  padding: 10px 15px; /* Adjust padding for better appearance */
+  border-radius: 5px; /* Optional: Rounded corners */
+}
+
 .slider_area {
   position: relative;
   height: 100vh;

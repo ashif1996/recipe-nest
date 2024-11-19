@@ -1,3 +1,28 @@
+.error-border {
+    border: 1px solid red !important;
+}
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 8px; /* Slight overlap if needed */
+    margin-bottom: 15px;
+    
+    text-align: left;
+    display: block;
+    width: 100%; /* Ensure it spans the full width of its parent container */
+    box-sizing: border-box; /* Ensure padding doesn’t overflow */
+}
+.flash-messages {
+    width: 100%; /* Match the width of the column */
+    margin-bottom: 20px; /* Add some space below */
+}
+
+.alert {
+    margin-bottom: 0; /* Remove default margin */
+    padding: 10px 15px; /* Adjust padding for better appearance */
+    border-radius: 5px; /* Optional: Rounded corners */
+}
+
 .login-line {
     width: 50%;
     max-width: 80px;
@@ -34,15 +59,18 @@
 }
 
 .login_form_inner .form-group input {
-    width: 90%; /* Increased width for inputs */
+    width: 100%; /* Ensure input fields are fully aligned with their parent container */
     max-width: 450px; /* Matches container width */
     height: 50px;
     margin: 15px auto;
+    margin-bottom: 5px;
     border-radius: 5px;
     border: 1px solid #ced4da;
     padding: 10px;
     font-size: 16px;
+    box-sizing: border-box; /* Ensure padding doesn’t overflow */
 }
+
 
 .login_form_inner .form-group input:focus {
     border-color: #85FF00;
