@@ -1,50 +1,49 @@
 <header>
-    <div class="header-area ">
-        <div id="sticky-header" class="main-header-area ">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-xl-3 col-lg-2">
-                        <div class="logo">
-                            <a href="/" class="app-name">RecipeNest</a>
-                        </div>
+    <div class="header-area">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-xl-3 col-lg-2">
+                    <div class="logo">
+                        <a href="/" class="app-name">RecipeNest</a>
                     </div>
-                    <div class="col-xl-6 col-lg-7">
-                        <div class="main-menu d-none d-lg-block">
-                            <nav>
-                                <ul id="navigation">
-                                    <li><a href="/">Home</a></li>
-                                    <li><a href="/recipes">Recipes</a></li>
-                                    <li><a href="/contact">Contact</a></li>
+                </div>
+                <div class="col-xl-6 col-lg-7">
+                    <div class="main-menu d-none d-lg-block">
+                        <nav>
+                            <ul id="navigation">
+                                <li><a href="/">Home</a></li>
+                                <li><a href="/categories">Categories</a></li>
+                                <li><a href="/recipes">Recipes</a></li>
+                                <li><a href="/contact">Contact</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 d-none d-lg-block">
+                    <div class="header-right d-flex align-items-center justify-content-end">
+                        <% if (isLoggedIn) { %>
+                            <div class="dropdown">
+                                <button 
+                                    class="btn btn-secondary dropdown-toggle" 
+                                    type="button" 
+                                    id="userDropdown" 
+                                    data-bs-toggle="dropdown" 
+                                    aria-expanded="false">
+                                    <%= username %>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="/users/add-category">Add Category</a></li>
+                                    <li><a class="dropdown-item" href="/users/add-recipe">Add Recipe</a></li>
+                                    <li><a class="dropdown-item" href="/users/favourite-recipes">Favourites</a></li>
+                                    <li><a class="dropdown-item" href="/users/logout">Logout</a></li>
                                 </ul>
-                            </nav>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-3 d-none d-lg-block">
-                        <div class="header-right d-flex align-items-center justify-content-end">
-                            <!-- Check if the user is logged in -->
+                            </div>
+                        <% } else { %>
+                            <!-- User is not logged in -->
                             <div class="user-login">
                                 <a href="/users/login" class="line_btn">Login</a>
-
-                                <!-- Show username with dropdown if the user is logged in -->
-                                <div class="dropdown user-dropdown d-none">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Username
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="userDropdown">
-                                        <a class="dropdown-item" href="#">Favourites</a>
-                                        <a class="dropdown-item" href="#">Logout</a>
-                                    </div>
-                                </div>
                             </div>
-                            <div class="search_icon">
-                                <a href="#">
-                                    <i class="ti-search"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="mobile_menu d-block d-lg-none"></div>
+                        <% } %>
                     </div>
                 </div>
             </div>
