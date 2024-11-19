@@ -3,16 +3,31 @@
         <div class="row justify-content-center align-items-center" style="min-height: 100vh;">
             <div class="col-xs-12 col-sm-10 col-md-8 col-lg-6">
                 <div class="login_form_inner mx-auto my-auto">
+                    <div class="flash-messages mb-4">
+                        <% if (successMessage && successMessage.length > 0) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <%= successMessage %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <% } %>
+                        <% if (errorMessage && errorMessage.length > 0) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <%= errorMessage %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <% } %>
+                    </div>
+
                     <h3>Log in to RecipeNest</h3>
-                    <div class="login-line"></div>
+                    <div class="login-line" style="margin-bottom: 20px;"></div>
                     <form id="loginForm" action="/users/login" method="post">
                         <div class="form-group">
                             <input type="email" class="form-control" id="loginEmail" name="email" placeholder="Email Address">
-                            <span id="loginEmailError" class="error-message"></span>
+                            <span id="loginEmailError" class="error-message" style="margin-left: 35px; margin-top: 5px;"></span>
                         </div>
                         <div class="form-group">
                             <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Password">
-                            <span id="loginPasswordError" class="error-message"></span>
+                            <span id="loginPasswordError" class="error-message" style="margin-left: 35px; margin-top: 5px;"></span>
                         </div>
                         <div class="form-group">
                             <button type="submit" value="submit" class="btn login-btn">Log in</button>

@@ -1,0 +1,30 @@
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Category</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="container mt-5" style="margin-bottom: 100px;">
+        <h2 class="text-center">Add New Category</h2>
+        <div class="custom-line"></div>
+        <form action="/categories/add" method="POST">
+            <div class="form-group mb-3">
+                <label for="name" class="mb-1">Category Name</label>
+                <input type="text" class="form-control" id="name" name="name" required maxlength="50">
+            </div>
+            <div class="form-group mb-3">
+                <label for="description" class="mb-1">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" required maxlength="300"></textarea>
+            </div>
+            <div class="form-group mb-3">
+                <label for="image" class="mb-1">Image URL</label>
+                <input type="url" class="form-control" id="image" name="image" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+    </div>
+</div>

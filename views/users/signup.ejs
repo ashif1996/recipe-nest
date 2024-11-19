@@ -1,7 +1,24 @@
 <div class="signup-container">
     <div class="signup-form">
-        <h2 class="text-center mb-4">Sign Up</h2>
+        <div class="flash-messages mb-4">
+            <% if (successMessage && successMessage.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= successMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            <% if (errorMessage && errorMessage.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        </div>
+        
+        <h2 class="text-center">Sign Up</h2>
+        <div class="login-line" style="margin-bottom: 20px;"></div>
         <form action="/users/signup" method="post" id="signupForm">
+            <input type="hidden" name="redirectUrl" value="/users/signup">
             <div class="row">
                 <div class="col-md-6">
                     <input type="text" class="form-control mb-3" id="firstName" name="firstName" placeholder="First Name">
@@ -17,7 +34,7 @@
                     <input type="email" class="form-control" id="email" name="email" placeholder="Email Address">
                     <button type="button" class="btn btn-send-otp" id="sendOtpBtn">Send OTP</button>
                 </div>
-                <span id="emailError" class="error-message"></span>
+                <span id="emailError" class="error-message" style="margin-top: 5px;"></span>
             </div>
             <div id="otpSection" style="display: none;">
                 <div class="input-group mb-3">

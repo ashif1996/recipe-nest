@@ -1,0 +1,66 @@
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Add Recipe</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container mt-5" style="margin-bottom: 100px;">
+        <h2 class="text-center" style="font-weight: bolder;">Add New Recipe</h2>
+        <div class="custom-line"></div>
+        <form action="/recipes/add" method="POST" enctype="multipart/form-data">
+            <!-- Recipe Name -->
+            <div class="form-group mb-3">
+                <label for="name" class="mb-1">Recipe Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            
+            <!-- Category -->
+            <div class="form-group mb-3">
+                <label for="category" class="mb-1">Category</label>
+                <select class="form-control" id="category" name="category" required>
+                    <option value="appetizer">Appetizer</option>
+                    <option value="main">Main Course</option>
+                    <option value="dessert">Dessert</option>
+                    <!-- Add more categories here -->
+                </select>
+            </div>
+
+            <!-- Image -->
+            <div class="form-group mb-3">
+                <label for="image" class="mb-1">Recipe Image (URL)</label>
+                <input type="url" class="form-control" id="image" name="image" required>
+            </div>
+
+            <!-- Preparation Time -->
+            <div class="form-group mb-3">
+                <label for="preparationTime" class="mb-1">Preparation Time</label>
+                <input type="text" class="form-control" id="preparationTime" name="preparationTime" required>
+            </div>
+
+            <!-- Serving Size -->
+            <div class="form-group mb-3">
+                <label for="servingSize" class="mb-1">Serving Size</label>
+                <input type="text" class="form-control" id="servingSize" name="servingSize" required>
+            </div>
+
+            <!-- Ingredients -->
+            <div class="form-group mb-3">
+                <label for="ingredients" class="mb-1">Ingredients (separate each item by pressing Enter)</label>
+                <textarea class="form-control" id="ingredients" name="ingredients" required></textarea>
+            </div>
+
+            <!-- Steps -->
+            <div class="form-group mb-3">
+                <label for="steps" class="mb-1">Preparation Steps (separate each step by pressing Enter)</label>
+                <textarea class="form-control" id="steps" name="steps" required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Add Recipe</button>
+        </form>
+    </div>
+</div>
