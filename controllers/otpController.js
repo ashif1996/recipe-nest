@@ -6,45 +6,54 @@ const {
     verifyOtp,
     cleanupExpiredOtps
 } = require("../utils/otpUtils");
+const HttpStatus = require("../utils/httpStatusCode");
 
 const sendOtpToUser = async (req, res) => {
-    const { email } = req.body;
+    const { email, redirectUrl } = req.body;
 
     try {
-        await cleanupExpiredOtps(email);
+        await cleanupExpiredOtps();
 
         const otp = generateOtp();
+        console.log("Generated OTP:", otp);
         await storeOtp(email, otp);
         await sendOtp(email, otp);
 
-        req.flash("success", "OTP sent successfully.");
-        return res.redirect("/users/signup");
+        req.session.otpSend = true;
+        req.session.email = email;
+
+        return res.json({ success: true, otpSend: true, message: "OTP sent successfully.", redirectUrl });
     } catch (error) {
-        console.log("An error occurred when processing OTP: ", error);
-        
-        req.flash("error", error.message || "Failed to process OTP. Please try again.");
-        return res.redirect("/users/signup");
+        return res.json({ success: false, otpSend: false, message: error.message || "Failed to send OTP.", redirectUrl });
     }
 };
 
 const handleOtpVerification = async (req, res) => {
-    const { otp } = req.body;
+    const { otp, redirectUrl } = req.body;
+    const email = req.session.email;
 
     try {
         const result = await verifyOtp(email, otp);
         if (result.isVerified) {
-            req.flash("success", "OTP verified successfully.");
-            return res.redirect("/users/signup");
+            req.session.otpSend = false;
+
+            return res.status(HttpStatus.OK).json({
+                success: true,
+                message: "OTP verified successfully.",
+                redirectUrl,
+            });
         } else {
-            const message = result.reason === "expired" ? "The OTP is expired." : "Invalid OTP.";
-            req.flash("error", message);
-            res.redirect("/users/signup");
+            const message = result.reason === "expired" ? "The OTP has expired." : "Invalid OTP.";
+            return res.status(HttpStatus.BAD_REQUEST).json({ success: false, message });
         }
     } catch (error) {
         console.error("Error verifying OTP: ", error);
 
-        req.flash("error", "Error verifying the OTP. Please try again.");
-        res.redirect("/users/signup");
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "An error occurred while verifying OTP.",
+            redirectUrl,
+        });
     }
 };
 

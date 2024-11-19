@@ -1,5 +1,4 @@
 require("dotenv").config();
-const cookie = require("cookie-parser");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -16,10 +15,6 @@ const getUserLogin = (req, res) => {
 
 const userLogin = async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) {
-        req.flash("error", "All fields are required.");
-        return res.redirect("/users/login");
-    }
 
     try {
         const user = await User.findOne({ email });
@@ -42,7 +37,7 @@ const userLogin = async (req, res) => {
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_SECRET_TIME,
+            expiresIn: 3600,
         });
 
         res.cookie("authtoken", token, {
@@ -71,10 +66,6 @@ const getUserSignup = (req, res) => {
 
 const userSignup = async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        req.flash("error", "All fields are required.");
-        return res.redirect("/users/signup");
-    }
 
     try {
         const isExistingUser = await User.findOne({ email });
@@ -84,7 +75,7 @@ const userSignup = async (req, res) => {
         }
 
         if (password !== confirmPassword) {
-            req.flash("error", "Passwords donot match.");
+            req.flash("error", "Passwords do not match.");
             return res.redirect("/users/signup");
         }
 
@@ -107,9 +98,48 @@ const userSignup = async (req, res) => {
     }
 };
 
+const userLogout = (req, res) => {
+    res.clearCookie("authtoken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+
+    req.flash("success", "Logged out successfully!");
+    res.redirect("/users/login");
+};
+
+const getFavouriteRecipes = (req, res) => {
+    const locals = { title: "Favourite Recipes | RecipeNest" };
+    return res.status(HttpStatuscode.OK).render("users/favourites", {
+        locals,
+        layout: "layouts/mainLayout",
+    });
+};
+
+const getAddRecipe = (req, res) => {
+    const locals = { title: "Add Recipe | RecipeNest" };
+    return res.status(HttpStatuscode.OK).render("users/addRecipe", {
+        locals,
+        layout: "layouts/mainLayout",
+    });
+};
+
+const getAddCategory = (req, res) => {
+    const locals = { title: "Add Recipe | RecipeNest" };
+    return res.status(HttpStatuscode.OK).render("users/addCategory", {
+        locals,
+        layout: "layouts/mainLayout",
+    });
+};
+
 module.exports = {
     getUserLogin,
     userLogin,
     getUserSignup,
     userSignup,
+    userLogout,
+    getFavouriteRecipes,
+    getAddRecipe,
+    getAddCategory,
 };
