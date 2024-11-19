@@ -36,7 +36,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-    const token = req.cookies.authtoken;
+    const token = req.cookies.authToken;
 
     if (token) {
         try {

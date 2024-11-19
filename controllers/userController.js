@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -40,7 +41,7 @@ const userLogin = async (req, res) => {
             expiresIn: 3600,
         });
 
-        res.cookie("authtoken", token, {
+        res.cookie("authToken", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 1000 * 60 * 60 * 24,
@@ -99,7 +100,7 @@ const userSignup = async (req, res) => {
 };
 
 const userLogout = (req, res) => {
-    res.clearCookie("authtoken", {
+    res.clearCookie("authToken", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
