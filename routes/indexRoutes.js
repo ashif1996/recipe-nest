@@ -5,6 +5,7 @@ const indexController = require("../controllers/indexController");
 
 router.get("/", indexController.getHome);
 router.get("/contact", indexController.getContact);
+router.get("/categories", indexController.getCategories);
 router.get("/recipes", indexController.getRecipes);
 router.get("/recipes/recipe-details", indexController.getRecipeDetails);
 
