@@ -11,7 +11,7 @@ const storeOtp = async (email, otp) => {
         const newOtp = new OTP({
             email,
             otp,
-            expiresAt: new Date(Date.now + 1 * 60 * 1000),
+            expiresAt: new Date(Date.now() + 1 * 60 * 1000),
         });
         await newOtp.save();
     } catch (error) {
@@ -30,11 +30,11 @@ const sendOtp = async (email, otp) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log("OTP sent successfully");
+        console.log("OTP sent successfully to:", email);
     } catch (error) {
-        console.error("Error sending OTP: ", error);
+        console.error("Error sending the OTP:", error);
         throw new Error("Failed to send OTP.");
-    }
+    }    
 };
 
 const verifyOtp = async (email, otp) => {
@@ -66,7 +66,7 @@ const verifyOtp = async (email, otp) => {
 };
 
 const cleanupExpiredOtps = async () => {
-    const now = new Date.now;
+    const now = new Date();
     try {
         await OTP.deleteMany({ expiresAt: { $lte: now } });
         console.log("Expired OTP's cleaned up successfully.");

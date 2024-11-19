@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const transportor = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: process.env.SEND_OTP_EMAIL,
@@ -9,4 +9,4 @@ const transportor = nodemailer.createTransport({
     secure: true,
 });
 
-module.exports = transportor;
+module.exports = transporter;

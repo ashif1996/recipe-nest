@@ -6,8 +6,10 @@ connectToDatabase();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const nocache = require("nocache");
+const jwt = require("jsonwebtoken");
 const expressLayouts = require("express-ejs-layouts");
 const app = express();
 
@@ -19,6 +21,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false },
 }));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(expressLayouts);
 app.set("views", path.join(__dirname, "views"));
@@ -29,6 +32,28 @@ app.use(flash());
 app.use((req, res, next) => {
     res.locals.successMessage = req.flash("success");
     res.locals.errorMessage = req.flash("error");
+    next();
+});
+
+app.use((req, res, next) => {
+    const token = req.cookies.authtoken;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            res.locals.isLoggedIn = true;
+            res.locals.username = `${decoded.firstName} ${decoded.lastName}`.trim();
+        } catch (error) {
+            console.error("Invalid token:", error.message);
+
+            res.locals.isLoggedIn = false;
+            res.locals.username = null;
+        }
+    } else {
+        res.locals.isLoggedIn = false;
+        res.locals.username = null;
+    }
     next();
 });
 
