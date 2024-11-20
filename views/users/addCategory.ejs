@@ -9,22 +9,41 @@
     </div>
     
     <div class="container mt-5" style="margin-bottom: 100px;">
+        <div class="flash-messages mb-4">
+            <% if (successMessage && successMessage.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= successMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            <% if (errorMessage && errorMessage.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        </div>
         <h2 class="text-center">Add New Category</h2>
         <div class="custom-line"></div>
-        <form action="/categories/add" method="POST">
+        <form action="/users/categories/add" id="categoryForm" method="POST" enctype="multipart/form-data">
             <div class="form-group mb-3">
                 <label for="name" class="mb-1">Category Name</label>
-                <input type="text" class="form-control" id="name" name="name" required maxlength="50">
+                <input type="text" class="form-control" id="categoryName" name="categoryName" maxlength="50">
+                <span id="categoryNameError" class="error-message"></span>
             </div>
             <div class="form-group mb-3">
                 <label for="description" class="mb-1">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" required maxlength="300"></textarea>
+                <textarea class="form-control" id="description" name="description" rows="3" maxlength="300"></textarea>
+                <span id="descriptionError" class="error-message"></span>
             </div>
             <div class="form-group mb-3">
                 <label for="image" class="mb-1">Image URL</label>
-                <input type="url" class="form-control" id="image" name="image" required>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <span id="imageError" class="error-message"></span>
             </div>
             <button type="submit" class="btn btn-primary">Add Category</button>
         </form>
     </div>
 </div>
+
+<script src="/js/category.js"></script>
