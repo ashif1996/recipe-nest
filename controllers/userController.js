@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
+const Category = require("../models/categoryModel");
 const HttpStatuscode = require("../utils/httpStatusCode");
 
 const getUserLogin = (req, res) => {
@@ -118,6 +119,50 @@ const getFavouriteRecipes = (req, res) => {
     });
 };
 
+const getAddCategory = (req, res) => {
+    const locals = { title: "Add Recipe | RecipeNest" };
+    return res.status(HttpStatuscode.OK).render("users/addCategory", {
+        locals,
+        layout: "layouts/mainLayout",
+    });
+};
+
+const addCategory = async (req, res) => {
+    const { categoryName, description } = req.body;
+
+    try {
+        const isExistingCategory = await Category.findOne({
+            categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
+        });
+        if (isExistingCategory) {
+            req.flash("error", "Category already exists.");
+            return res.redirect("/users/categories/add");
+        }
+
+        if (!req.file) {
+            req.flash("error", "Image upload failed or no file uploaded.");
+            return res.redirect("/users/categories/add");
+        }
+
+        const imagePath = `/images/categories/${req.file.filename}`;
+
+        const newCategory = new Category({
+            categoryName,
+            description,
+            image: imagePath,
+        });
+        await newCategory.save();
+
+        req.flash("success", `${categoryName} category created.`);
+        return res.redirect("/categories");
+    } catch (error) {
+        console.error("Error creating category:", error);
+
+        req.flash("error", "Error creating category.");
+        return res.redirect("/categories");
+    }
+};
+
 const getAddRecipe = (req, res) => {
     const locals = { title: "Add Recipe | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("users/addRecipe", {
@@ -126,12 +171,8 @@ const getAddRecipe = (req, res) => {
     });
 };
 
-const getAddCategory = (req, res) => {
-    const locals = { title: "Add Recipe | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("users/addCategory", {
-        locals,
-        layout: "layouts/mainLayout",
-    });
+const addRecipe = (req, res) => {
+
 };
 
 module.exports = {
@@ -141,6 +182,8 @@ module.exports = {
     userSignup,
     userLogout,
     getFavouriteRecipes,
-    getAddRecipe,
     getAddCategory,
+    addCategory,
+    getAddRecipe,
+    addRecipe,
 };
