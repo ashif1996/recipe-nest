@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
 const Category = require("../models/categoryModel");
+const Recipe = require("../models/recipeModel");
 const HttpStatuscode = require("../utils/httpStatusCode");
 
 const getUserLogin = (req, res) => {
@@ -136,12 +137,12 @@ const addCategory = async (req, res) => {
         });
         if (isExistingCategory) {
             req.flash("error", "Category already exists.");
-            return res.redirect("/users/categories/add");
+            return res.redirect("/users/add-category");
         }
 
         if (!req.file) {
             req.flash("error", "Image upload failed or no file uploaded.");
-            return res.redirect("/users/categories/add");
+            return res.redirect("/users/add-category");
         }
 
         const imagePath = `/images/categories/${req.file.filename}`;
@@ -151,9 +152,10 @@ const addCategory = async (req, res) => {
             description,
             image: imagePath,
         });
+        
         await newCategory.save();
 
-        req.flash("success", `${categoryName} category created.`);
+        req.flash("success", `${categoryName} category added.`);
         return res.redirect("/categories");
     } catch (error) {
         console.error("Error creating category:", error);
@@ -163,16 +165,70 @@ const addCategory = async (req, res) => {
     }
 };
 
-const getAddRecipe = (req, res) => {
+const getAddRecipe = async (req, res) => {
     const locals = { title: "Add Recipe | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("users/addRecipe", {
-        locals,
-        layout: "layouts/mainLayout",
-    });
+    
+    try {
+        const categories = await Category.find();
+
+        return res.status(HttpStatuscode.OK).render("users/addRecipe", {
+            locals,
+            categories,
+            layout: "layouts/mainLayout",
+        });
+    } catch (error) {
+        console.error("Error fetching category:", error);
+
+        req.flash("error", "Error fetching category.");
+        return res.redirect("/users/login");
+    }
 };
 
-const addRecipe = (req, res) => {
+const addRecipe = async (req, res) => {
+    const { recipeName, category, image, preparationTime, servingSize, ingredients, steps } = req.body;
 
+    try {
+        const isExistingRecipe = await Recipe.findOne({ 
+            recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
+        });
+        if (isExistingRecipe) {
+            req.flash("Recipe already exists.");
+            return res.redirect("/users/add-recipe");
+        }
+
+        const categoryId = await Category.findOne({ categoryName: category });
+        if (!categoryId) {
+            req.flash("error", "Invalid category selected.");
+            return res.redirect("/users/add-recipe");
+        }
+
+        if (!req.file) {
+            req.flash("error", "Image upload failed or no file uploaded.");
+            return res.redirect("/users/add-recipe");
+        }
+
+        const imagePath = req.file.filename;
+
+        const newRecipe = new Recipe({
+            recipeName,
+            category: categoryId,
+            image: imagePath,
+            preparationTime,
+            servingSize,
+            ingredients: ingredients.split("\n"),
+            steps: steps.split("\n"),
+        });
+
+        await newRecipe.save();
+
+        req.flash("success", `${recipeName} recipe added.`);
+        return res.redirect("/recipes");
+    } catch (error) {
+        console.error("Error adding recipe:", error);
+
+        req.flash("error", "Error adding recipe.");
+        return res.redirect("/recipes");
+    }
 };
 
 module.exports = {
