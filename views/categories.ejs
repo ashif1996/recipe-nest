@@ -29,27 +29,19 @@
             <div class="row">
                 <div class="col-xl-12">
                     <div class="dish_wrap d-flex">
-                        <div class="single_dish text-center">
-                            <div class="thumb">
-                                <img src="/images/recipies/recpie_4.png" alt="">
-                            </div>
-                            <h3>Birthday Catering</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        </div>
-                        <div class="single_dish text-center">
-                            <div class="thumb">
-                                <img src="/images/recipies/recpie_5.png" alt="">
-                            </div>
-                            <h3>Birthday Catering</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        </div>
-                        <div class="single_dish text-center">
-                            <div class="thumb">
-                                <img src="/images/recipies/recpie_6.png" alt="">
-                            </div>
-                            <h3>Birthday Catering</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                        </div>
+                        <% if (categories.length > 0) { %>
+                            <% categories.forEach((category) => { %>
+                                <div class="single_dish text-center">
+                                    <div class="thumb">
+                                        <img src="<%= category.image %>" alt="<%= category.name %>">
+                                    </div>
+                                    <h3><%= category.categoryName %></h3>
+                                    <p><%= category.description %></p>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p>No categories available.</p>
+                        <% } %>
                     </div>
                 </div>
             </div>

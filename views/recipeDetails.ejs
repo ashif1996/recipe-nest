@@ -4,7 +4,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
             <li class="breadcrumb-item"><a href="/recipes" style="color: #007bff;">Recipes</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Egg Manchurian</li>
+            <li class="breadcrumb-item active" aria-current="page"><%= recipe.recipeName %></li>
         </ol>
     </nav>
 
@@ -14,14 +14,14 @@
             <!-- Left Section for Image and Basic Details -->
             <div class="col-lg-4">
                 <div class="recipe-img">
-                    <img src="/images/recipies/recpie_1.png" alt="Egg Manchurian" class="img-fluid">
+                    <img src="/images/recipes/<%= recipe.image %>" alt="<%= recipe.recipeName %>" class="img-fluid">
                 </div>
                 <div class="recipe-info">
-                    <h2>Egg Manchurian</h2>
-                    <p><strong>Category:</strong> Appetizer</p>
-                    <p><strong>Preparation Time:</strong> 30 Minutes</p>
-                    <p><strong>Serving Size:</strong> 2-4 People</p>
-                    <a href="/recipes/recipe-details" class="line_btn mt-3" style="margin-left: -5px;">Add to Favourites</a>
+                    <h2 class="mb-4"><%= recipe.recipeName %></h2>
+                    <p><strong>Category:</strong> <%= recipe.category.categoryName %></p>
+                    <p><strong>Preparation Time:</strong> <%= recipe.preparationTime %> mins</p>
+                    <p><strong>Serving Size:</strong> <%= recipe.servingSize %></p>
+                    <a href="/recipes/recipe-details" class="line_btn favourite-btn mt-3">Add to Favourites</a>
                 </div>
             </div>
 
@@ -31,12 +31,9 @@
                 <div class="ingredients-box modern-box mb-4 p-4">
                     <h3>Ingredients</h3>
                     <ul>
-                        <li>3 boiled eggs, halved</li>
-                        <li>1/2 cup chopped onions</li>
-                        <li>1/4 cup green bell peppers, diced</li>
-                        <li>1 tablespoon soy sauce</li>
-                        <li>1/2 teaspoon chili sauce</li>
-                        <li>Salt and pepper to taste</li>
+                        <% recipe.ingredients.forEach((ingredient) => { %>
+                            <li><%= ingredient %></li>
+                        <% }); %>
                     </ul>
                 </div>
 
@@ -44,11 +41,9 @@
                 <div class="instructions-box modern-box p-4">
                     <h3>Preparation Steps</h3>
                     <ol>
-                        <li>Heat a pan and add a small amount of oil.</li>
-                        <li>Sauté onions and green bell peppers until soft.</li>
-                        <li>Add soy sauce, chili sauce, salt, and pepper. Stir well.</li>
-                        <li>Add the boiled egg halves and gently mix to coat them with the sauce.</li>
-                        <li>Serve hot and garnish with chopped green onions if desired.</li>
+                        <% recipe.steps.forEach((step, index) => { %>
+                            <li><%= step %></li>
+                        <% }); %>
                     </ol>
                 </div>
             </div>
@@ -61,50 +56,17 @@
         <div class="recepie_area plus_padding">
             <div class="container">
                 <div class="row">
-                    <div class="col-xl-3 col-lg-4 col-md-6">
+                    <% similarRecipes.forEach((similarRecipe) => { %>
                         <div class="single_recepie text-center">
                             <div class="recepie_thumb">
-                                <img src="/images/recipies/recpie_1.png" alt="">
+                                <img src="/images/recipes/<%= similarRecipe.image %>" alt="<%= similarRecipe.recipeName %>">
                             </div>
-                            <h3>Egg Manchurian</h3>
-                            <span>Appetizer</span>
-                            <p>Time Needs: 30 Mins</p>
-                            <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
+                            <h3><%= similarRecipe.recipeName %></h3>
+                            <span><%= similarRecipe.category.categoryName %></span>
+                            <p>Time Needs: <%= similarRecipe.preparationTime %> mins</p>
+                            <a href="/recipes/<%= similarRecipe._id %>" class="line_btn">View Full Recipe</a>
                         </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="single_recepie text-center">
-                            <div class="recepie_thumb">
-                                <img src="/images/recipies/recpie_2.png" alt="">
-                            </div>
-                            <h3>Pure Vegetable Bowl</h3>
-                            <span>Appetizer</span>
-                            <p>Time Needs: 30 Mins</p>
-                            <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="single_recepie text-center">
-                            <div class="recepie_thumb">
-                                <img src="/images/recipies/recpie_3.png" alt="">
-                            </div>
-                            <h3>Egg Masala Ramen</h3>
-                            <span>Appetizer</span>
-                            <p>Time Needs: 30 Mins</p>
-                            <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="single_recepie text-center">
-                            <div class="recepie_thumb">
-                                <img src="/images/recipies/recpie_3.png" alt="">
-                            </div>
-                            <h3>Egg Masala Ramen</h3>
-                            <span>Appetizer</span>
-                            <p>Time Needs: 30 Mins</p>
-                            <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                        </div>
-                    </div>
+                    <% }); %>
                 </div>
             </div>
         </div>

@@ -7,54 +7,40 @@
             </ol>
         </nav>
     </div>
+
+    <div class="flash-messages mb-4">
+        <% if (successMessage && successMessage.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (errorMessage && errorMessage.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+    </div>
     
     <div class="recepie_area plus_padding">
         <div class="container">
             <div class="row">
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_1.png" alt="">
+                <% if (recipes.length > 0) { %>
+                    <% recipes.forEach((recipe) => { %> <!-- Loop through recipes -->
+                        <div class="col-md-4 single_recepie text-center">
+                            <div class="recepie_thumb">
+                                <img src="/images/recipes/<%= recipe.image %>" alt="<%= recipe.name %>"> <!-- Dynamically display the image -->
+                            </div>
+                            <h3><%= recipe.recipeName %></h3> <!-- Dynamically display recipe name -->
+                            <span><%= recipe.category.categoryName %></span> <!-- Dynamically display recipe category -->
+                            <p>Time Needs: <%= recipe.preparationTime %> mins</p> <!-- Dynamically display time -->
+                            <a href="/recipes/<%= recipe._id %>" class="line_btn">View Full Recipe</a> <!-- Link to full recipe -->
                         </div>
-                        <h3>Egg Manchurian</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_2.png" alt="">
-                        </div>
-                        <h3>Pure Vegetable Bowl</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_3.png" alt="">
-                        </div>
-                        <h3>Egg Masala Ramen</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_3.png" alt="">
-                        </div>
-                        <h3>Egg Masala Ramen</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>No recipes found.</p>
+                <% } %>  
             </div>
         </div>
     </div>

@@ -20,39 +20,21 @@
 <div class="recepie_area">
     <div class="container">
         <div class="row">
-            <div class="col-xl-4 col-lg-4 col-md-6">
-                <div class="single_recepie text-center">
-                    <div class="recepie_thumb">
-                        <img src="/images/recipies/recpie_1.png" alt="">
+            <% if (recipes.length > 0) { %>
+                <% recipes.forEach((recipe) => { %> <!-- Loop through recipes -->
+                    <div class="single_recepie text-center">
+                        <div class="recepie_thumb">
+                            <img src="/images/recipes/<%= recipe.image %>" alt="<%= recipe.name %>"> <!-- Dynamically display the image -->
+                        </div>
+                        <h3><%= recipe.recipeName %></h3> <!-- Dynamically display recipe name -->
+                        <span><%= recipe.category.categoryName %></span> <!-- Dynamically display recipe category -->
+                        <p>Time Needs: <%= recipe.preparationTime %> mins</p> <!-- Dynamically display time -->
+                        <a href="/recipes/<%= recipe._id %>" class="line_btn">View Full Recipe</a> <!-- Link to full recipe -->
                     </div>
-                    <h3>Egg Manchurian</h3>
-                    <span>Appetizer</span>
-                    <p>Time Needs: 30 Mins</p>
-                    <a href="#" class="line_btn">View Full Recipe</a>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-4 col-md-6">
-                <div class="single_recepie text-center">
-                    <div class="recepie_thumb">
-                        <img src="/images/recipies/recpie_2.png" alt="">
-                    </div>
-                    <h3>Pure Vegetable Bowl</h3>
-                    <span>Appetizer</span>
-                    <p>Time Needs: 30 Mins</p>
-                    <a href="#" class="line_btn">View Full Recipe</a>
-                </div>
-            </div>
-            <div class="col-xl-4 col-lg-4 col-md-6">
-                <div class="single_recepie text-center">
-                    <div class="recepie_thumb">
-                        <img src="/images/recipies/recpie_3.png" alt="">
-                    </div>
-                    <h3>Egg Masala Ramen</h3>
-                    <span>Appetizer</span>
-                    <p>Time Needs: 30 Mins</p>
-                    <a href="#" class="line_btn">View Full Recipe</a>
-                </div>
-            </div>
+                <% }); %>
+            <% } else { %>
+                <p>No recipes found.</p>
+            <% } %>
         </div>
     </div>
 </div>
@@ -65,7 +47,7 @@
                 <div class="trand_info text-center">
                     <p>Thousands of recipes are waiting to be watched</p>
                     <h3>Discover latest trending recipes</h3>
-                    <a href="#" class="boxed-btn3">View all Recipes</a>
+                    <a href="/recipes" class="boxed-btn3">View all Recipes</a>
                 </div>
             </div>
         </div>
@@ -78,27 +60,19 @@
         <div class="row">
             <div class="col-xl-12">
                 <div class="dish_wrap d-flex">
-                    <div class="single_dish text-center">
-                        <div class="thumb">
-                            <img src="/images/recipies/recpie_4.png" alt="">
-                        </div>
-                        <h3>Birthday Catering</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                    </div>
-                    <div class="single_dish text-center">
-                        <div class="thumb">
-                            <img src="/images/recipies/recpie_5.png" alt="">
-                        </div>
-                        <h3>Birthday Catering</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                    </div>
-                    <div class="single_dish text-center">
-                        <div class="thumb">
-                            <img src="/images/recipies/recpie_6.png" alt="">
-                        </div>
-                        <h3>Birthday Catering</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                    </div>
+                    <% if (categories.length > 0) { %>
+                        <% categories.forEach((category) => { %>
+                            <div class="single_dish text-center">
+                                <div class="thumb">
+                                    <img src="<%= category.image %>" alt="<%= category.name %>">
+                                </div>
+                                <h3><%= category.categoryName %></h3>
+                                <p><%= category.description %></p>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p>No categories available.</p>
+                    <% } %>
                 </div>
             </div>
         </div>
