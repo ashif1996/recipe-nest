@@ -13,50 +13,21 @@
     <div class="recepie_area plus_padding">
         <div class="container">
             <div class="row">
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_1.png" alt="">
+                <% if (favourites.length > 0) { %>
+                    <% favourites.forEach(favourite => { %>
+                        <div class="single_recepie text-center">
+                            <div class="recepie_thumb">
+                                <img src="/images/recipes/<%= favourite.image %>" alt="<%= favourite.recipeName %>">
+                            </div>
+                            <h3><%= favourite.recipeName %></h3>
+                            <span><%= favourite.category.categoryName %></span>
+                            <p>Time Needs: <%= favourite.preparationTime %> Mins</p>
+                            <a href="/recipes/<%= favourite._id %>" class="line_btn">View Full Recipe</a>
                         </div>
-                        <h3>Egg Manchurian</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_2.png" alt="">
-                        </div>
-                        <h3>Pure Vegetable Bowl</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_3.png" alt="">
-                        </div>
-                        <h3>Egg Masala Ramen</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="single_recepie text-center">
-                        <div class="recepie_thumb">
-                            <img src="/images/recipies/recpie_3.png" alt="">
-                        </div>
-                        <h3>Egg Masala Ramen</h3>
-                        <span>Appetizer</span>
-                        <p>Time Needs: 30 Mins</p>
-                        <a href="/recipes/recipe-details" class="line_btn">View Full Recipe</a>
-                    </div>
-                </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="text-center">You don't have any favourite recipes yet!</p>
+                <% } %>
             </div>
         </div>
     </div>

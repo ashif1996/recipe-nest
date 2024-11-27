@@ -21,7 +21,7 @@
                     <p><strong>Category:</strong> <%= recipe.category.categoryName %></p>
                     <p><strong>Preparation Time:</strong> <%= recipe.preparationTime %> mins</p>
                     <p><strong>Serving Size:</strong> <%= recipe.servingSize %></p>
-                    <a href="/recipes/recipe-details" class="line_btn favourite-btn mt-3">Add to Favourites</a>
+                    <a href="#" id="add-to-favourite" class="line_btn favourite-btn mt-3" data-recipe-id="<%= recipe._id %>">Add to Favourites</a>
                 </div>
             </div>
 
@@ -52,7 +52,8 @@
 
     <!-- Similar Recipes Section -->
     <div class="similar-recipes">
-        <h3 class="text-center mb-4">Similar Recipes</h3>
+        <h3 class="text-center" style="font-weight: bolder;">Similar Recipes</h3>
+        <div class="custom-line"></div>
         <div class="recepie_area plus_padding">
             <div class="container">
                 <div class="row">
@@ -64,7 +65,7 @@
                             <h3><%= similarRecipe.recipeName %></h3>
                             <span><%= similarRecipe.category.categoryName %></span>
                             <p>Time Needs: <%= similarRecipe.preparationTime %> mins</p>
-                            <a href="/recipes/<%= similarRecipe._id %>" class="line_btn">View Full Recipe</a>
+                            <a href="/recipes/<%= similarRecipe._id %>" class="line_btn">View Recipe</a>
                         </div>
                     <% }); %>
                 </div>
@@ -72,3 +73,5 @@
         </div>
     </div>
 </div>
+
+<script src="/js/favourite.js"></script>

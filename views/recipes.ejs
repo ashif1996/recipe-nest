@@ -23,8 +23,49 @@
         <% } %>
     </div>
     
-    <div class="recepie_area plus_padding">
+    <div class="recepie_area plus_padding">        
         <div class="container">
+            <!-- Filters Section -->
+            <div class="filters">
+                <form id="recipeFilterForm" class="filters" method="GET" action="/recipes">
+                    <div class="filter-item">
+                        <label for="categoryFilter">Category:</label>
+                        <select id="categoryFilter" name="category" onchange="this.form.submit()">
+                            <option value="">All</option>
+                            <% categories.forEach(category => { %>
+                                <option value="<%= category._id %>" <%= category._id.toString() === categoryFilter ? 'selected' : '' %>><%= category.categoryName %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+
+                    <div class="filter-item search-group">
+                        <label for="searchRecipe">Search:</label>
+                        <div class="search-container">
+                            <input
+                                type="text"
+                                id="searchRecipe"
+                                name="search"
+                                placeholder="Search for recipes"
+                                value="<%= searchFilter || '' %>"
+                            />
+                            <button type="submit" class="btn btn-search">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                
+                    <div class="filter-item">
+                        <label for="sortFilter">Sort by:</label>
+                        <select id="sortFilter" name="sort" onchange="this.form.submit()">
+                            <option value="">Default</option>
+                            <option value="A-Z" <%= sortFilter === "A-Z" ? 'selected' : '' %>>A-Z</option>
+                            <option value="Z-A" <%= sortFilter === 'Z-A' ? 'selected' : '' %>>Z-A</option>
+                            <option value="newArrivals" <%= sortFilter === 'newArrivals' ? 'selected' : '' %>>New Arrivals</option>
+                            <option value="preparationTime" <%= sortFilter === "preparationTime" ? 'selected' : '' %>>Preparation Time</option>
+                        </select>
+                    </div>
+                </form>                                
+            </div>
             <div class="row">
                 <% if (recipes.length > 0) { %>
                     <% recipes.forEach((recipe) => { %> <!-- Loop through recipes -->
@@ -35,7 +76,7 @@
                             <h3><%= recipe.recipeName %></h3> <!-- Dynamically display recipe name -->
                             <span><%= recipe.category.categoryName %></span> <!-- Dynamically display recipe category -->
                             <p>Time Needs: <%= recipe.preparationTime %> mins</p> <!-- Dynamically display time -->
-                            <a href="/recipes/<%= recipe._id %>" class="line_btn">View Full Recipe</a> <!-- Link to full recipe -->
+                            <a href="/recipes/<%= recipe._id %>" class="line_btn">View Recipe</a> <!-- Link to full recipe -->
                         </div>
                     <% }); %>
                 <% } else { %>
@@ -43,5 +84,37 @@
                 <% } %>  
             </div>
         </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container mb-4">
+        <% if (totalPages > 1) { %>
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous Button -->
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="/recipes?page=<%= currentPage - 1 %><%= queryString %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+        
+                    <!-- Page Numbers -->
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="/recipes?page=<%= i %><%= queryString %>">
+                                <%= i %>
+                            </a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Next Button -->
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="/recipes?page=<%= currentPage + 1 %><%= queryString %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        <% } %>        
     </div>
 </div>
