@@ -17,6 +17,8 @@ router.get('/logout', userController.userLogout);
 
 router.get('/favourite-recipes', authenticateJWT, userController.getFavouriteRecipes);
 
+router.post("/add-favourites", userController.addFavouriteRecipes);
+
 router.route("/add-category")
     .get(authenticateJWT, userController.getAddCategory)
     .post(authenticateJWT, upload, userController.addCategory);
