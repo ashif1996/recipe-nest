@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const httpStatusCode = require("../utils/httpStatusCode");
 
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
