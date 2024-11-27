@@ -139,7 +139,7 @@ const addCategory = async (req, res) => {
             return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-category");
         }
 
-        const imagePath = `/images/categories/${req.file.filename}`;
+        const imagePath = req.file.filename;
 
         const newCategory = new Category({
             categoryName,
@@ -181,7 +181,7 @@ const getAddRecipe = async (req, res) => {
 };
 
 const addRecipe = async (req, res) => {
-    const { recipeName, category, image, preparationTime, servingSize, ingredients, steps } = req.body;
+    const { recipeName, category, preparationTime, servingSize, ingredients, steps } = req.body;
 
     try {
         const isExistingRecipe = await Recipe.findOne({ 
@@ -236,11 +236,32 @@ const addFavouriteRecipes = async (req, res) => {
         });
     }
 
-    const { recipeId } = req.body;
+    let userId;
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            if (err.name === "TokenExpiredError") {
+                return res.status(HttpStatuscode.UNAUTHORIZED).json({
+                    ok: false,
+                    message: "Token has expired.",
+                });
+            } else if (err.name === "JsonWebTokenError") {
+                return res.status(HttpStatuscode.UNAUTHORIZED).json({
+                    ok: false,
+                    message: "Token is invalid.",
+                });
+            }
+        }
+
+        userId = decoded.userId;
+    });
+
+    if (!userId) {
+        return;
+    }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
+        const { recipeId } = req.body;
 
         const user = await User.findById(userId).select("favourites");
         if (!user) {
