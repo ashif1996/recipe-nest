@@ -9,6 +9,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const nocache = require("nocache");
+const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const expressLayouts = require("express-ejs-layouts");
 const app = express();
@@ -28,6 +29,11 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(nocache());
 app.use(flash());
+
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}));
 
 app.use((req, res, next) => {
     res.locals.successMessage = req.flash("success");
