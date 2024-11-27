@@ -18,7 +18,7 @@ const recipeSchema = new Schema({
         required: true,
     },
     preparationTime: {
-        type: String,
+        type: Number,
         required: true,
     },
     servingSize: {
