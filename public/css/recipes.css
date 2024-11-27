@@ -50,3 +50,38 @@
     padding: 5px 0;
     border-bottom: 1px dashed #ccc;
 }
+
+.pagination-container {
+    margin-top: 20px;
+}
+
+.pagination {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pagination .page-item {
+    display: inline-block;
+    margin: 0 5px;
+}
+
+.pagination .page-link {
+    color: #007bff;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination .page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    color: #fff;
+    border: 1px solid #007bff;
+}
