@@ -1,4 +1,3 @@
-const OTP = require("../models/otpModel");
 const {
     generateOtp,
     storeOtp,
@@ -6,6 +5,7 @@ const {
     verifyOtp,
     cleanupExpiredOtps
 } = require("../utils/otpUtils");
+
 const HttpStatus = require("../utils/httpStatusCode");
 
 const sendOtpToUser = async (req, res) => {
@@ -22,9 +22,19 @@ const sendOtpToUser = async (req, res) => {
         req.session.otpSend = true;
         req.session.email = email;
 
-        return res.json({ success: true, otpSend: true, message: "OTP sent successfully.", redirectUrl });
+        return res.status(HttpStatus.OK).json({
+            success: true,
+            otpSend: true,
+            message: "OTP sent successfully.",
+            redirectUrl,
+        });
     } catch (error) {
-        return res.json({ success: false, otpSend: false, message: error.message || "Failed to send OTP.", redirectUrl });
+        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            otpSend: false,
+            message: error.message || "Failed to send OTP.",
+            redirectUrl,
+        });
     }
 };
 

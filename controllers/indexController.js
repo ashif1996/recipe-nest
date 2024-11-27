@@ -6,8 +6,47 @@ const getHome = async (req, res) => {
     const locals = { title: "Home | RecipeNest" };
 
     try {
-        const categories = await Category.find().limit(3);
-        const recipes = await Recipe.find().populate("category").limit(3);
+        const categories = await Category.find()
+            .select("categoryName image description")
+            .limit(3)
+            .lean();
+
+        const recipes = await Recipe.aggregate([
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "categoryDetails",
+                },
+            },
+            {
+                $unwind: "$categoryDetails",
+            },
+            {
+                $group: {
+                    _id: "$category",
+                    recipeId: { $first: "$_id" },
+                    image: { $first: "$image" },
+                    recipeName: { $first: "$recipeName" },
+                    categoryName: { $first: "$categoryDetails.categoryName" },
+                    preparationTime: { $first: "$preparationTime" },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    recipeId: 1,
+                    image: 1,
+                    recipeName: 1,
+                    categoryName: 1,
+                    preparationTime: 1,
+                },
+            },
+            {
+                $limit: 3,
+            },
+        ]);
 
         return res.status(HttpStatuscode.OK).render("index", {
             locals,
@@ -19,7 +58,7 @@ const getHome = async (req, res) => {
         console.error("Error fetching category:", error);
 
         req.flash("error", "Error fetching category.");
-        return res.redirect("/users/login");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/users/login");
     }
 };
 
@@ -33,20 +72,94 @@ const getContact = (req, res) => {
 
 const getRecipes = async (req, res) => {
     const locals = { title: "Recipes | RecipeNest" };
+    const { category, search, sort } = req.query;
 
     try {
-        const recipes = await Recipe.find().populate("category");
+        const searchFilter = search?.trim() || null;
+        const categoryFilter = category?.trim() || null;
+        const sortFilter = sort?.trim() || null;
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = 9;
+
+        const filter = {};
+
+        if (categoryFilter) {
+            filter.category = categoryFilter;
+        }
+
+        if (searchFilter) {
+            filter.recipeName = { $regex: searchFilter, $options: "i" };
+        }
+
+        let sortOptions = {};
+        
+        switch (sortFilter) {
+            case "A-Z":
+                sortOptions = { recipeName: 1 };
+                break;
+            case "Z-A":
+                sortOptions = { recipeName: -1 };
+                break;
+            case "newArrivals":
+                sortOptions = { createdAt: -1 };
+                break;
+            case "preparationTime":
+                sortOptions = { preparationTime: 1 };
+                break;
+            default:
+                sortOptions = {};
+        }
+
+        let queryString = "";
+
+        if (categoryFilter) {
+            queryString += `&category=${categoryFilter}`;
+        }
+        
+        if (searchFilter) {
+            queryString += `&search=${searchFilter}`;
+        }
+        
+        if (sortFilter) {
+            queryString += `&sort=${sortFilter}`;
+        }
+
+        const categories = await Category.find()
+            .select("_id categoryName")
+            .lean();
+
+        const recipes = await Recipe.find(filter)
+            .select("recipeName image category preparationTime")
+            .populate({
+                path: "category",
+                select: "categoryName",
+            })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort(sortOptions)
+            .lean();
+
+        const totalRecipes = await Recipe.countDocuments(filter);
+        const totalPages = Math.ceil(totalRecipes / limit);
 
         return res.status(HttpStatuscode.OK).render("recipes", {
             locals,
+            categoryFilter,
+            searchFilter,
+            sortFilter,
+            categories,
             recipes,
+            currentPage: page,
+            queryString,
+            totalPages,
             layout: "layouts/mainLayout",
         });
     } catch (error) {
         console.error("Error fetching recipes:", error);
 
         req.flash("error", "Error fetching recipes.");
-        return res.redirect("/");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
     }
 };
 
@@ -55,11 +168,22 @@ const getRecipeDetails = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const recipe = await Recipe.findById(id).populate("category");
+        const recipe = await Recipe.findById(id)
+            .select("_id category recipeName image preparationTime servingSize ingredients steps")
+            .populate({
+                path: "category",
+                select: "categoryName",
+            })
+            .lean();
 
         const similarRecipes = await Recipe.find({ category: recipe.category })
-            .populate("category")
-            .limit(3);
+            .select("_id category recipeName image preparationTime")
+            .populate({
+                path: "category",
+                select: "categoryName",
+            })
+            .limit(3)
+            .lean();
 
         return res.status(HttpStatuscode.OK).render("recipeDetails", {
             locals,
@@ -71,7 +195,7 @@ const getRecipeDetails = async (req, res) => {
         console.error("Error fetching recipe details:", error);
 
         req.flash("error", "Error fetching recipe details.");
-        return res.redirect("/");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
     }
 };
 
@@ -79,7 +203,9 @@ const getCategories = async (req, res) => {
     const locals = { title: "Recipe Categories | RecipeNest" };
 
     try {
-        const categories = await Category.find();
+        const categories = await Category.find()
+            .select("categoryName image description")
+            .lean();
 
         return res.status(HttpStatuscode.OK).render("categories", {
             locals,
@@ -90,7 +216,7 @@ const getCategories = async (req, res) => {
         console.error("Error fetching category:", error);
 
         req.flash("error", "Error fetching category.");
-        return res.redirect("/");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
     }
 };
 
