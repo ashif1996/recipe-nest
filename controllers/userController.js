@@ -6,6 +6,7 @@ const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
 const HttpStatuscode = require("../utils/httpStatusCode");
+const sendEmail = require("../utils/emailUtils");
 
 // Renders the login page for users
 const getUserLogin = (req, res) => {
@@ -341,7 +342,23 @@ const getFavouriteRecipes = async (req, res) => {
 
 // Handles sending an email through the contact form
 const processSendEmail = async (req, res) => {
+    const { name, email, message } = req.body;
 
+    try {
+        await sendEmail(name, email, message);
+
+        res.status(HttpStatuscode.OK).json({
+            success: true,
+            message: "Email sent successfully.",
+        });
+    } catch (error) {
+        console.error("Failed to send email:", error);
+
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: 'Failed to send email.',
+        });
+    }
 };
 
 module.exports = {
