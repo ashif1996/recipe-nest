@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// Schema for storing OTP's
 const otpSchema = new Schema({
     email: {
         type: String,

@@ -1,13 +1,13 @@
-require("dotenv").config();
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/userModel");
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
+
 const HttpStatuscode = require("../utils/httpStatusCode");
 
+// Renders the login page for users
 const getUserLogin = (req, res) => {
     const locals = { title: "User Login | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("users/login", {
@@ -16,6 +16,7 @@ const getUserLogin = (req, res) => {
     });
 };
 
+// Handles user login by verifying credentials, generating a JWT token, and setting it in cookies
 const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -60,6 +61,7 @@ const userLogin = async (req, res) => {
     }
 };
 
+// Renders the signup page for new users
 const getUserSignup = (req, res) => {
     const locals = { title: "User SignUp | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("users/signup", {
@@ -68,6 +70,7 @@ const getUserSignup = (req, res) => {
     });
 };
 
+// Handles user registration by validating inputs
 const userSignup = async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
 
@@ -103,6 +106,7 @@ const userSignup = async (req, res) => {
     }
 };
 
+// Logs out the user by clearing the authentication token from cookies
 const userLogout = (req, res) => {
     res.clearCookie("authToken", {
         httpOnly: true,
@@ -114,6 +118,7 @@ const userLogout = (req, res) => {
     res.status(HttpStatuscode.OK).redirect("/users/login");
 };
 
+// Renders the page to add categoies
 const getAddCategory = (req, res) => {
     const locals = { title: "Add Recipe | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("users/addCategory", {
@@ -122,6 +127,7 @@ const getAddCategory = (req, res) => {
     });
 };
 
+// Handles the addition of a new category
 const addCategory = async (req, res) => {
     const { categoryName, description } = req.body;
 
@@ -159,6 +165,7 @@ const addCategory = async (req, res) => {
     }
 };
 
+// Renders the page to add recipe
 const getAddRecipe = async (req, res) => {
     const locals = { title: "Add Recipe | RecipeNest" };
     
@@ -180,6 +187,7 @@ const getAddRecipe = async (req, res) => {
     }
 };
 
+// Handles the addition of a new recipe
 const addRecipe = async (req, res) => {
     const { recipeName, category, preparationTime, servingSize, ingredients, steps } = req.body;
 
@@ -227,6 +235,7 @@ const addRecipe = async (req, res) => {
     }
 };
 
+// Adds a recipe to the user's list of favorites
 const addFavouriteRecipes = async (req, res) => {
     const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
@@ -297,6 +306,7 @@ const addFavouriteRecipes = async (req, res) => {
     }
 };
 
+// Fetches and renders the user's favorite recipes
 const getFavouriteRecipes = async (req, res) => {
     const locals = { title: "Favourite Recipes | RecipeNest" };
     const userId = req.user.userId;
@@ -329,6 +339,11 @@ const getFavouriteRecipes = async (req, res) => {
     }
 };
 
+// Handles sending an email through the contact form
+const processSendEmail = async (req, res) => {
+
+};
+
 module.exports = {
     getUserLogin,
     userLogin,
@@ -341,4 +356,5 @@ module.exports = {
     addRecipe,
     addFavouriteRecipes,
     getFavouriteRecipes,
+    processSendEmail,
 };

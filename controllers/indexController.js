@@ -1,7 +1,9 @@
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
+
 const HttpStatuscode = require("../utils/httpStatusCode");
 
+// Render the home page with categories and recipes
 const getHome = async (req, res) => {
     const locals = { title: "Home | RecipeNest" };
 
@@ -58,10 +60,11 @@ const getHome = async (req, res) => {
         console.error("Error fetching category:", error);
 
         req.flash("error", "Error fetching category.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/users/login");
+        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/users/login");
     }
 };
 
+// Render the contact page
 const getContact = (req, res) => {
     const locals = { title: "Contact Us | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("contact", {
@@ -70,13 +73,14 @@ const getContact = (req, res) => {
     });
 };
 
+// Render the recipes page with filters and sorting
 const getRecipes = async (req, res) => {
     const locals = { title: "Recipes | RecipeNest" };
     const { category, search, sort } = req.query;
 
     try {
-        const searchFilter = search?.trim() || null;
         const categoryFilter = category?.trim() || null;
+        const searchFilter = search?.trim() || null;
         const sortFilter = sort?.trim() || null;
 
         const page = parseInt(req.query.page) || 1;
@@ -159,10 +163,11 @@ const getRecipes = async (req, res) => {
         console.error("Error fetching recipes:", error);
 
         req.flash("error", "Error fetching recipes.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
+        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
     }
 };
 
+// Render recipe details page along with similar recipes
 const getRecipeDetails = async (req, res) => {
     const locals = { title: "Recipe Details | RecipeNest" };
     const { id } = req.params;
@@ -195,10 +200,11 @@ const getRecipeDetails = async (req, res) => {
         console.error("Error fetching recipe details:", error);
 
         req.flash("error", "Error fetching recipe details.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
+        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
     }
 };
 
+// Render all recipe categories
 const getCategories = async (req, res) => {
     const locals = { title: "Recipe Categories | RecipeNest" };
 
@@ -216,7 +222,7 @@ const getCategories = async (req, res) => {
         console.error("Error fetching category:", error);
 
         req.flash("error", "Error fetching category.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/");
+        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
     }
 };
 

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+// Schema for storing Recipe
 const recipeSchema = new Schema({
     category: {
         type: Schema.Types.ObjectId,

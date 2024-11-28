@@ -3,8 +3,8 @@ require("dotenv").config();
 const connectToDatabase = require("./config/dbConfig");
 connectToDatabase();
 
-const express = require("express");
 const path = require("path");
+const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
@@ -12,6 +12,7 @@ const nocache = require("nocache");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const expressLayouts = require("express-ejs-layouts");
+
 const app = express();
 
 app.use(express.json());

@@ -8,6 +8,7 @@ const {
 
 const HttpStatus = require("../utils/httpStatusCode");
 
+// Handles sending an OTP to the user's email address
 const sendOtpToUser = async (req, res) => {
     const { email, redirectUrl } = req.body;
 
@@ -38,6 +39,7 @@ const sendOtpToUser = async (req, res) => {
     }
 };
 
+// Verifies the OTP provided by the user
 const handleOtpVerification = async (req, res) => {
     const { otp, redirectUrl } = req.body;
     const email = req.session.email;

@@ -1,7 +1,9 @@
-const multer = require("multer");
-const path = require("path");
 const fs = require("fs");
+const path = require("path");
 
+const multer = require("multer");
+
+// Multer configuration to store image files
 const uploadDirRecipes = path.join(__dirname, "..", "public", "images", "recipes");
 if (!fs.existsSync(uploadDirRecipes)) {
     fs.mkdirSync(uploadDirRecipes, { recursive: true });

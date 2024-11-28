@@ -1,3 +1,4 @@
+// Define and export an object containing HTTP status codes
 const HttpStatus = {
     OK: 200,
     CREATED: 201,
@@ -10,7 +11,7 @@ const HttpStatus = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     CONFLICT: 409,
-    INTERNAL_SERVER_ERROR: 500
+    INTERNAL_SERVER_ERROR: 500,
   };
   
   module.exports = HttpStatus;

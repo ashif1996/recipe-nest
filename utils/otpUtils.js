@@ -2,8 +2,10 @@ const crypto = require("crypto");
 const OTP = require("../models/otpModel");
 const transporter = require("../config/emailConfig");
 
+// Generate a 6-digit random OTP
 const generateOtp = () => crypto.randomInt(100000, 999999).toString();
 
+// Store the OTP in the database with an expiration time of 1 minute
 const storeOtp = async (email, otp) => {
     try {
         await OTP.deleteMany({ email });
@@ -20,6 +22,7 @@ const storeOtp = async (email, otp) => {
     }
 };
 
+// Send the OTP to the user's email
 const sendOtp = async (email, otp) => {
     const mailOptions = {
         from: process.env.SEND_OTP_EMAIL,
@@ -37,6 +40,7 @@ const sendOtp = async (email, otp) => {
     }    
 };
 
+// Verify the OTP entered by the user
 const verifyOtp = async (email, otp) => {
     try {
         const latestOtp = await OTP.findOne({ email })
@@ -65,6 +69,7 @@ const verifyOtp = async (email, otp) => {
     }
 };
 
+// Cleanup expired OTPs from the database
 const cleanupExpiredOtps = async () => {
     const now = new Date();
     try {
