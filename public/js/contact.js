@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isValidContactForm = validateContactForm();
             if (isValidContactForm) {
-                handleFormSubmit(contactForm, '/contact/send-email', 'POST');
+                handleFormSubmit(contactForm, '/users/contact/send-email', 'POST');
             }
         });
     }
