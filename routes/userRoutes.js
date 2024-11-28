@@ -27,4 +27,6 @@ router.route("/add-recipe")
     .get(authenticateJWT, userController.getAddRecipe)
     .post(authenticateJWT, upload, userController.addRecipe);
 
+router.post("/contact/send-email", userController.processSendEmail);
+
 module.exports = router;
