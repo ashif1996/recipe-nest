@@ -5,7 +5,9 @@ const User = require("../models/userModel");
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
+const showFlashMessages = require("../utils/messageUtils");
 const HttpStatuscode = require("../utils/httpStatusCode");
+const { fetchUserId, isTokenPresent } = require("../utils/userUtils");
 const sendEmail = require("../utils/emailUtils");
 
 // Renders the login page for users
@@ -24,14 +26,26 @@ const userLogin = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            req.flash("error", "User not found. Please try again.");
-            return res.status(HttpStatuscode.NOT_FOUND).redirect("/users/login");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "User not found. Please try again.",
+                status: HttpStatuscode.NOT_FOUND,
+                redirectUrl: "/users/login",
+            });
         }
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            req.flash("error", "Password does not match.");
-            return res.status(HttpStatuscode.UNAUTHORIZED).redirect("/users/login");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Password does not match.",
+                status: HttpStatuscode.UNAUTHORIZED,
+                redirectUrl: "/users/login",
+            });
         }
 
         const payload = {
@@ -52,13 +66,24 @@ const userLogin = async (req, res) => {
             sameSite: "strict",
         });
 
-        req.flash("success", "Login successful!");
-        return res.status(HttpStatuscode.OK).redirect("/");
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: "Login successful!",
+            status: HttpStatuscode.OK,
+            redirectUrl: "/",
+        });
     } catch (error) {
         console.error("Error verifying the credentials:", error);
-
-        req.flash("error", "An error occurred. Please try again later.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/users/login");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/login",
+        });
     }
 };
 
@@ -78,13 +103,25 @@ const userSignup = async (req, res) => {
     try {
         const isExistingUser = await User.findOne({ email });
         if (isExistingUser) {
-            req.flash("error", "Email already taken.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/signup");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Email already taken.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/signup",
+            });
         }
 
         if (password !== confirmPassword) {
-            req.flash("error", "Passwords do not match.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/signup");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Passwords do not match.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/signup",
+            });
         }
 
         const newUser = new User({
@@ -97,13 +134,24 @@ const userSignup = async (req, res) => {
 
         await newUser.save();
 
-        req.flash("success", "User registration successfull.");
-        return res.status(HttpStatuscode.CREATED).redirect("/users/login");
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: "User registration successfull.",
+            status: HttpStatuscode.CREATED,
+            redirectUrl: "/users/login",
+        });
     } catch (error) {
         console.error("Error registering the user:", error);
-
-        req.flash("error", "An error occurred. Please try again.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/users/signup");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/signup",
+        });
     }
 };
 
@@ -115,8 +163,14 @@ const userLogout = (req, res) => {
         sameSite: "strict",
     });
 
-    req.flash("success", "Logged out successfully!");
-    res.status(HttpStatuscode.OK).redirect("/users/login");
+    return showFlashMessages({
+        req,
+        res,
+        type: "success",
+        message: "Logged out successfully!",
+        status: HttpStatuscode.OK,
+        redirectUrl: "/users/login",
+    });
 };
 
 // Renders the page to add categoies
@@ -137,13 +191,25 @@ const addCategory = async (req, res) => {
             categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
         });
         if (isCategoryNameExist) {
-            req.flash("error", "Category name already exists.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-category");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Category name already exists.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/add-category",
+            });
         }
 
         if (!req.file) {
-            req.flash("error", "Image upload failed or no file uploaded.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-category");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Image upload failed or no file uploaded.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/add-category",
+            });
         }
 
         const imagePath = req.file.filename;
@@ -156,13 +222,24 @@ const addCategory = async (req, res) => {
 
         await newCategory.save();
 
-        req.flash("success", `${categoryName} category added.`);
-        return res.status(HttpStatuscode.CREATED).redirect("/categories");
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: `${categoryName} category added.`,
+            status: HttpStatuscode.CREATED,
+            redirectUrl: "/categories",
+        });
     } catch (error) {
         console.error("Error creating category:", error);
-
-        req.flash("error", "Error creating category.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/categories");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/categories",
+        });
     }
 };
 
@@ -173,22 +250,29 @@ const getEditCategory = async (req, res) => {
     try {
         const category = await Category.findById(id);
         if (!category) {
-            req.flash("error", `Category not found.`);
-            return res.status(HttpStatuscode.NOT_FOUND).redirect("/categories");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Category not found.",
+                status: HttpStatuscode.NOT_FOUND,
+                redirectUrl: "/categories",
+            });
         }
 
-        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
-        if (!token) {
-            req.flash("error", `Token not found.`);
-            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
-        }
-
+        const token = isTokenPresent(req, "/categories");
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
 
         if (category.userId.toString() !== userId) {
-            req.flash("error", `Unauthorized access.`);
-            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Unauthorized access.",
+                status: HttpStatuscode.FORBIDDEN,
+                redirectUrl: "/categories",
+            });
         }
 
         return res.status(HttpStatuscode.OK).render("users/editCategory", {
@@ -198,9 +282,14 @@ const getEditCategory = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching edit category:", error);
-
-        req.flash("error", "Error fetching edit category.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/categories");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/categories",
+        });
     }
 };
 
@@ -211,8 +300,14 @@ const editCategory = async (req, res) => {
     try {
         const isExistingCategory = await Category.findById(id, "image");
         if (!isExistingCategory) {
-            req.flash("error", `Category not found.`);
-            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Category not found.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
+            });
         }
 
         const isCategoryNameExist = await Category.findOne({
@@ -220,8 +315,14 @@ const editCategory = async (req, res) => {
             categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
         });
         if (isCategoryNameExist) {
-            req.flash("error", `Category with this name already exists.`);
-            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Category with this name already exists.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
+            });
         }
 
         let updatedImagePath = isExistingCategory.image;
@@ -235,17 +336,35 @@ const editCategory = async (req, res) => {
             { new: true },
         );
         if (!updatedCategory) {
-            req.flash("error", `Failed to update category.`);
-            return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Failed to update category.",
+                status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+                isJson: true,
+            });
         }
 
-        req.flash("success", `${categoryName} category updated successfully.`);
-        return res.status(HttpStatuscode.OK).json({ success: true });
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: `${categoryName} category updated successfully.`,
+            status: HttpStatuscode.OK,
+            isJson: true,
+            success: true,
+        });
     } catch (error) {
         console.error("Error updating the category:", error);
-
-        req.flash("error", "An error occurred while updating the category. Please try again.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred while updating the category. Please try again.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            isJson: true,
+        });
     }
 };
 
@@ -265,9 +384,14 @@ const getAddRecipe = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching category:", error);
-
-        req.flash("error", "Error fetching category.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/users/login");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/login",
+        });
     }
 };
 
@@ -280,29 +404,42 @@ const addRecipe = async (req, res) => {
             recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
         });
         if (isRecipeNameExist) {
-            req.flash("Recipe name already exists.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-recipe");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Recipe name already exists.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/add-recipe",
+            });
         }
 
         const categoryId = await Category.findOne({ categoryName: category }).select("_id");
         if (!categoryId) {
-            req.flash("error", "Invalid category selected.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-recipe");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Invalid category selected.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/add-recipe",
+            });
         }
 
         if (!req.file) {
-            req.flash("error", "Image upload failed or no file uploaded.");
-            return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-recipe");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Image upload failed or no file uploaded.",
+                status: HttpStatuscode.BAD_REQUEST,
+                redirectUrl: "/users/add-recipe",
+            });
         }
 
         const imagePath = req.file.filename;
 
-        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
-        if (!token) {
-            req.flash("error", `Token not found.`);
-            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
-        }
-
+        const token = isTokenPresent(req, "/users/add-recipe");
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
 
@@ -319,13 +456,24 @@ const addRecipe = async (req, res) => {
 
         await newRecipe.save();
 
-        req.flash("success", `${recipeName} recipe added.`);
-        return res.status(HttpStatuscode.CREATED).redirect("/recipes");
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: `${recipeName} recipe added.`,
+            status: HttpStatuscode.CREATED,
+            redirectUrl: "/recipes",
+        });
     } catch (error) {
         console.error("Error adding recipe:", error);
-
-        req.flash("error", "Error adding recipe.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/recipes");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/recipes",
+        });
     }
 };
 
@@ -336,8 +484,14 @@ const getEditRecipe = async (req, res) => {
     try {
         const recipe = await Recipe.findById(id);
         if (!recipe) {
-            req.flash("error", `Recipe not found.`);
-            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Recipe not found.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
+            });
         }
 
         const categories = await Category.find()
@@ -347,18 +501,19 @@ const getEditRecipe = async (req, res) => {
         recipe.ingredients = recipe.ingredients.join("\n");
         recipe.steps = recipe.steps.join("\n");           
 
-        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
-        if (!token) {
-            req.flash("error", `Token not found.`);
-            return res.status(HttpStatuscode.FORBIDDEN).redirect("/recipes");
-        }
-
+        const token = isTokenPresent(req, "/recipes");
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
 
         if (recipe.userId.toString() !== userId) {
-            req.flash("error", `Unauthorized access.`);
-            return res.status(HttpStatuscode.FORBIDDEN).redirect("/recipes");
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Unauthorized access.",
+                status: HttpStatuscode.FORBIDDEN,
+                redirectUrl: "/recipes",
+            });
         }
 
         return res.status(HttpStatuscode.OK).render("users/editRecipe", {
@@ -369,9 +524,14 @@ const getEditRecipe = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching edit recipe:", error);
-
-        req.flash("error", "Error fetching edit recipe.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/recipes");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/recipes",
+        });
     }
 };
 
@@ -382,8 +542,14 @@ const editRecipe = async (req, res) => {
     try {
         const isExistingRecipe = await Recipe.findById(id, "image");
         if (!isExistingRecipe) {
-            req.flash("error", "Recipe not found.");
-            return res.status(HttpStatuscode.NOT_FOUND).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Recipe not found.",
+                status: HttpStatuscode.NOT_FOUND,
+                isJson: true,
+            });
         }
 
         const isExistingRecipeName = await Recipe.findOne({
@@ -391,8 +557,14 @@ const editRecipe = async (req, res) => {
             recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
         });
         if (isExistingRecipeName) {
-            req.flash("Recipe name already exists.");
-            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Recipe name already exists.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
+            });
         }
 
         let updatedImagePath = isExistingRecipe.image;
@@ -414,17 +586,35 @@ const editRecipe = async (req, res) => {
             { new: true },
         );
         if (!updatedRecipe) {
-            req.flash("error", `Failed to update recipe.`);
-            return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
+                message: "Failed to update recipe.",
+                status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+                isJson: true,
+            });
         }
 
-        req.flash("success", `${recipeName} updated successfully.`);
-        return res.status(HttpStatuscode.OK).json({ success: true });
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: `${recipeName} updated successfully.`,
+            status: HttpStatuscode.OK,
+            isJson: true,
+            success: true,
+        });
     } catch (error) {
         console.error("Error updating the recipe:", error);
-
-        req.flash("error", "An error occurred while updating the recipe. Please try again.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred while updating the recipe. Please try again.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            isJson: true,
+        });
     }
 };
 
@@ -526,9 +716,14 @@ const getFavouriteRecipes = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching favourite recipes:", error);
-
-        req.flash("error", "Error fetching favourite recipes.");
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/recipes");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "An error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/recipes",
+        });
     }
 };
 
