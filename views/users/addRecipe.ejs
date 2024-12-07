@@ -9,6 +9,20 @@
     </div>
 
     <div class="container mt-5" style="margin-bottom: 100px;">
+        <div class="flash-messages mb-4">
+            <% if (successMessage && successMessage.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= successMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            <% if (errorMessage && errorMessage.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        </div>
         <h2 class="text-center" style="font-weight: bolder;">Add New Recipe</h2>
         <div class="custom-line"></div>
         <form id="recipeForm" action="/users/add-recipe" method="POST" enctype="multipart/form-data">
