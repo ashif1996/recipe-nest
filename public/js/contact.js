@@ -96,28 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
             hideLoader();
 
             if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: data.message,
-                }).then(() => {
-                    window.location.reload();
-                });
+                window.location.reload();
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: data.message,
-                });
+                window.location.reload();
             }
         } catch (error) {
             hideLoader();
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'An error occurred while processing the request',
-            });
+            
+            window.location.reload();
         }
     };
 
