@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const recipeForm = document.getElementById("recipeForm");
+    const editRecipeForm = document.getElementById("editRecipeForm");
 
     const displayErrors = (fieldId, message) => {
         const errorElement = document.getElementById(`${fieldId}Error`);
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const servingSize = document.getElementById("servingSize").value.trim();
         const ingredients = document.getElementById("ingredients").value.trim();
         const steps = document.getElementById("steps").value.trim();
+        const isEditMode = document.getElementById("isEditMode").value === "true";
 
         clearErrors();
 
@@ -47,12 +49,27 @@ document.addEventListener("DOMContentLoaded", () => {
             isValid = false;
         }
 
-        if (!image) {
-            displayErrors("image", "Recipe image is required.");
-            isValid = false;
-        } else if (!["image/png", "image/jpeg", "image/jpg", "image/webp"].includes(image.type)) {
-            displayErrors("image", "Only PNG, JPEG, JPG, and WEBP formats are allowed.");
-            isValid = false;
+        if (!isEditMode) {
+            if (!image) {
+                displayErrors("image", "An image file is required.");
+                isValid = false;
+            } else if (!image.type.startsWith("image/")) {
+                displayErrors("image", "Only image files are allowed.");
+                isValid = false;
+            } else if (image.size > 5 * 1024 * 1024) {
+                displayErrors("image", "Image size should not exceed 5MB.");
+                isValid = false;
+            }
+        } else {
+            if (image) {
+                if (!image.type.startsWith("image/")) {
+                    displayErrors("image", "Only image files are allowed.");
+                    isValid = false;
+                } else if (image.size > 5 * 1024 * 1024) {
+                    displayErrors("image", "Image size should not exceed 5MB.");
+                    isValid = false;
+                }
+            }
         }
 
         if (!preparationTime || isNaN(preparationTime) || preparationTime <= 0) {
@@ -85,6 +102,38 @@ document.addEventListener("DOMContentLoaded", () => {
             const isValidRecipeForm = validateRecipeForm();
             if (isValidRecipeForm) {
                 recipeForm.submit();
+            }
+        });
+    }
+
+    if (editRecipeForm) {
+        editRecipeForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const isValidRecipeForm = validateRecipeForm();
+            if (!isValidRecipeForm) {
+                return;
+            }
+
+            const formData = new FormData(editRecipeForm);
+            const recipeId = editRecipeForm.action.split("/").pop();
+
+            try {
+                const response = await fetch(`/users/edit-recipe/${recipeId}`, {
+                    method: "PUT",
+                    body: formData,
+                });
+    
+                const result = await response.json();
+    
+                if (response.ok && result.success) {
+                    window.location.href = `/recipes`;
+                } else {
+                    window.location.href = `/users/edit-recipe/${recipeId}`;
+                } 
+            } catch (error) {
+                console.error("Error submitting form:", error);
+                window.location.href = `/recipes`;
             }
         });
     }
