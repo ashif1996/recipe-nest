@@ -1,0 +1,55 @@
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Category</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="container mt-5" style="margin-bottom: 100px;">
+        <div class="flash-messages mb-4">
+            <% if (successMessage && successMessage.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= successMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            <% if (errorMessage && errorMessage.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+        </div>
+        <h2 class="text-center">Edit Category</h2>
+        <div class="custom-line"></div>
+        <form action="/users/edit-category/<%= category._id %>" id="editCategoryForm" method="put" enctype="multipart/form-data">
+            <input type="hidden" name="_method" value="put">
+            <input type="hidden" id="isEditMode" name="isEditMode" value="true">
+            <input type="hidden" name="userId" value="<%= category.userId %>">
+            <div class="form-group mb-3">
+                <label for="name" class="mb-1">Category</label>
+                <input type="text" class="form-control" id="categoryName" name="categoryName" maxlength="50" value="<%= category.categoryName %>">
+                <span id="categoryNameError" class="error-message"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label for="description" class="mb-1">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" maxlength="300"><%= category.description %></textarea>
+                <span id="descriptionError" class="error-message"></span>
+            </div>
+            <div class="mb-3">
+                <img src="/images/categories/<%= category.image %>" alt="Category Image" class="img-thumbnail" width="200">
+            </div>            
+            <div class="form-group mb-3">
+                <label for="image" class="mb-1">Image</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <span id="imageError" class="error-message"></span>
+            </div>
+            <button type="submit" class="btn line_btn mt-4">Update Category</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/category.js"></script>

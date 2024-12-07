@@ -1,0 +1,76 @@
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Recipe</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container mt-5" style="margin-bottom: 100px;">
+        <h2 class="text-center" style="font-weight: bolder;">Edit Recipe</h2>
+        <div class="custom-line"></div>
+        <form id="editRecipeForm" action="/users/edit-recipe/<%= recipe._id %>" method="put" enctype="multipart/form-data">
+            <input type="hidden" name="_method" value="put">
+            <input type="hidden" id="isEditMode" name="isEditMode" value="true">
+            <input type="hidden" name="userId" value="<%= recipe.userId %>">
+            <div class="form-group mb-3">
+                <label for="name" class="mb-1">Recipe Name</label>
+                <input type="text" class="form-control" id="recipeName" name="recipeName" value="<%= recipe.recipeName %>">
+                <span id="recipeNameError" class="error-message"></span>
+            </div>
+            
+            <!-- Category -->
+            <div class="form-group mb-3">
+                <label for="category" class="mb-1">Category</label>
+                <select class="form-control" id="category" name="category">
+                    <% categories.forEach((category) => { %>
+                        <option value="<%= category._id %>"><%= category.categoryName %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="mb-3">
+                <img src="/images/recipes/<%= recipe.image %>" alt="Recipe Image" class="img-thumbnail" width="200">
+            </div>
+            <div class="form-group mb-3">
+                <label for="image" class="mb-1">Image</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                <span id="imageError" class="error-message"></span>
+            </div>
+
+            <!-- Preparation Time -->
+            <div class="form-group mb-3">
+                <label for="preparationTime" class="mb-1">Preparation Time</label>
+                <input type="text" class="form-control" id="preparationTime" name="preparationTime" value="<%= recipe.preparationTime %>">
+                <span id="preparationTimeError" class="error-message"></span>
+            </div>
+
+            <!-- Serving Size -->
+            <div class="form-group mb-3">
+                <label for="servingSize" class="mb-1">Serving Size</label>
+                <input type="text" class="form-control" id="servingSize" name="servingSize" value="<%= recipe.servingSize %>">
+                <span id="servingSizeError" class="error-message"></span>
+            </div>
+
+            <!-- Ingredients -->
+            <div class="form-group mb-3">
+                <label for="ingredients" class="mb-1">Ingredients (separate each item by pressing Enter)</label>
+                <textarea class="form-control" id="ingredients" name="ingredients"><%= recipe.ingredients %></textarea>
+                <span id="ingredientsError" class="error-message"></span>
+            </div>
+
+            <!-- Steps -->
+            <div class="form-group mb-3">
+                <label for="steps" class="mb-1">Preparation Steps (separate each step by pressing Enter)</label>
+                <textarea class="form-control" id="steps" name="steps"><%= recipe.steps %></textarea>
+                <span id="stepsError" class="error-message"></span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn line_btn mt-4">Update Recipe</button>
+        </form>
+    </div>
+</div>
+
+<script src="/js/recipe.js"></script>
