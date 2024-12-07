@@ -3,7 +3,9 @@ const jwt = require("jsonwebtoken");
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
+const showFlashMessages = require("../utils/messageUtils");
 const HttpStatuscode = require("../utils/httpStatusCode");
+const { fetchUserId } = require("../utils/userUtils");
 
 // Render the home page with categories and recipes
 const getHome = async (req, res) => {
@@ -60,9 +62,14 @@ const getHome = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching category:", error);
-
-        req.flash("error", "Error fetching category.");
-        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/users/login");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "Error fetching home page.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/login",
+        });
     }
 };
 
@@ -163,9 +170,14 @@ const getRecipes = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching recipes:", error);
-
-        req.flash("error", "Error fetching recipes.");
-        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "Error fetching recipes.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/",
+        });
     }
 };
 
@@ -192,21 +204,7 @@ const getRecipeDetails = async (req, res) => {
             .limit(3)
             .lean();
 
-        let userId = null;
-
-        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
-        if (token) {
-            try {
-                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-                userId = decodedToken.userId;
-            } catch (error) {
-                if (error.name === "TokenExpiredError") {
-                    console.warn("Token is expired, proceeding as an unauthenticated user.");
-                } else {
-                    console.error("Error verifying token:", error);
-                }
-            }
-        }
+        const userId = await fetchUserId(req);
 
         return res.status(HttpStatuscode.OK).render("recipeDetails", {
             locals,
@@ -217,9 +215,14 @@ const getRecipeDetails = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching recipe details:", error);
-
-        req.flash("error", "Error fetching recipe details.");
-        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "Error fetching recipe details.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/",
+        });
     }
 };
 
@@ -232,21 +235,7 @@ const getCategories = async (req, res) => {
             .select("userId categoryName image description")
             .lean();
 
-        let userId = null;
-
-        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
-        if (token) {
-            try {
-                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-                userId = decodedToken.userId;
-            } catch (error) {
-                if (error.name === "TokenExpiredError") {
-                    console.warn("Token is expired, proceeding as an unauthenticated user.");
-                } else {
-                    console.error("Error verifying token:", error);
-                }
-            }
-        }
+        const userId = await fetchUserId(req);
 
         return res.status(HttpStatuscode.OK).render("categories", {
             locals,
@@ -256,9 +245,14 @@ const getCategories = async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching category:", error);
-
-        req.flash("error", "Error fetching category.");
-        return res.redirect("/");
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "Error fetching category.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/",
+        });
     }
 };
 
