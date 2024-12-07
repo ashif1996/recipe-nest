@@ -37,6 +37,9 @@
                                     </div>
                                     <h3><%= category.categoryName %></h3>
                                     <p><%= category.description %></p>
+                                    <% if (userId && category.userId.toString() === userId.toString()) { %>
+                                        <a href="/users/edit-category/<%= category._id %>" class="btn line_btn mt-2">Edit</a>
+                                    <% } %>
                                 </div>
                             <% }); %>
                         <% } else { %>

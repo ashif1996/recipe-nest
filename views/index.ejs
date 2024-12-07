@@ -64,10 +64,10 @@
                         <% categories.forEach((category) => { %>
                             <div class="single_dish text-center">
                                 <div class="thumb">
-                                    <img src="<%= category.image %>" alt="<%= category.name %>">
+                                    <img src="/images/categories/<%= category.image %>" alt="<%= category.name %>">
                                 </div>
                                 <h3><%= category.categoryName %></h3>
-                                <p><%= category.description %></p>
+                                <p class="mt-4"><%= category.description %></p>
                             </div>
                         <% }); %>
                     <% } else { %>

@@ -21,6 +21,9 @@
                     <p><strong>Category:</strong> <%= recipe.category.categoryName %></p>
                     <p><strong>Preparation Time:</strong> <%= recipe.preparationTime %> mins</p>
                     <p><strong>Serving Size:</strong> <%= recipe.servingSize %></p>
+                    <% if (userId && recipe.userId.toString() === userId.toString()) { %>
+                        <a href="/users/edit-recipe/<%= recipe._id %>" class="btn line_btn">Edit</a>
+                    <% } %>
                     <a href="#" id="add-to-favourite" class="line_btn favourite-btn mt-3" data-recipe-id="<%= recipe._id %>">Add to Favourites</a>
                 </div>
             </div>
