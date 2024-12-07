@@ -8,6 +8,7 @@ const express = require("express");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
+const methodOverride = require("method-override");
 const nocache = require("nocache");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -30,6 +31,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(nocache());
 app.use(flash());
+app.use(methodOverride("_method"));
 
 app.use(cors({
     origin: 'http://localhost:3000',
