@@ -121,7 +121,7 @@ const userLogout = (req, res) => {
 
 // Renders the page to add categoies
 const getAddCategory = (req, res) => {
-    const locals = { title: "Add Recipe | RecipeNest" };
+    const locals = { title: "Add Recipe Category | RecipeNest" };
     return res.status(HttpStatuscode.OK).render("users/addCategory", {
         locals,
         layout: "layouts/mainLayout",
@@ -133,11 +133,11 @@ const addCategory = async (req, res) => {
     const { categoryName, description } = req.body;
 
     try {
-        const isExistingCategory = await Category.findOne({
+        const isCategoryNameExist = await Category.findOne({
             categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
         });
-        if (isExistingCategory) {
-            req.flash("error", "Category already exists.");
+        if (isCategoryNameExist) {
+            req.flash("error", "Category name already exists.");
             return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-category");
         }
 
@@ -163,6 +163,89 @@ const addCategory = async (req, res) => {
 
         req.flash("error", "Error creating category.");
         return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/categories");
+    }
+};
+
+const getEditCategory = async (req, res) => {
+    const locals = { title: "Edit Recipe Category | RecipeNest" };
+    const { id } = req.params;
+
+    try {
+        const category = await Category.findById(id);
+        if (!category) {
+            req.flash("error", `Category not found.`);
+            return res.status(HttpStatuscode.NOT_FOUND).redirect("/categories");
+        }
+
+        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
+        if (!token) {
+            req.flash("error", `Token not found.`);
+            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
+        }
+
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
+        if (category.userId.toString() !== userId) {
+            req.flash("error", `Unauthorized access.`);
+            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
+        }
+
+        return res.status(HttpStatuscode.OK).render("users/editCategory", {
+            locals,
+            category,
+            layout: "layouts/mainLayout",
+        });
+    } catch (error) {
+        console.error("Error fetching edit category:", error);
+
+        req.flash("error", "Error fetching edit category.");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/categories");
+    }
+};
+
+const editCategory = async (req, res) => {
+    const { id } = req.params;
+    const { categoryName, description } = req.body;
+
+    try {
+        const isExistingCategory = await Category.findById(id, "image");
+        if (!isExistingCategory) {
+            req.flash("error", `Category not found.`);
+            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+        }
+
+        const isCategoryNameExist = await Category.findOne({
+            _id: { $ne: id },
+            categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
+        });
+        if (isCategoryNameExist) {
+            req.flash("error", `Category with this name already exists.`);
+            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+        }
+
+        let updatedImagePath = isExistingCategory.image;
+        if (req.file) {
+            updatedImagePath = req.file.filename;
+        }
+
+        const updatedCategory = await Category.findByIdAndUpdate(
+            id,
+            { categoryName, description, image: updatedImagePath },
+            { new: true },
+        );
+        if (!updatedCategory) {
+            req.flash("error", `Failed to update category.`);
+            return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+        }
+
+        req.flash("success", `${categoryName} category updated successfully.`);
+        return res.status(HttpStatuscode.OK).json({ success: true });
+    } catch (error) {
+        console.error("Error updating the category:", error);
+
+        req.flash("error", "An error occurred while updating the category. Please try again.");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
     }
 };
 
@@ -193,11 +276,11 @@ const addRecipe = async (req, res) => {
     const { recipeName, category, preparationTime, servingSize, ingredients, steps } = req.body;
 
     try {
-        const isExistingRecipe = await Recipe.findOne({ 
+        const isRecipeNameExist = await Recipe.findOne({ 
             recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
         });
-        if (isExistingRecipe) {
-            req.flash("Recipe already exists.");
+        if (isRecipeNameExist) {
+            req.flash("Recipe name already exists.");
             return res.status(HttpStatuscode.BAD_REQUEST).redirect("/users/add-recipe");
         }
 
@@ -214,7 +297,17 @@ const addRecipe = async (req, res) => {
 
         const imagePath = req.file.filename;
 
+        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
+        if (!token) {
+            req.flash("error", `Token not found.`);
+            return res.status(HttpStatuscode.FORBIDDEN).redirect("/categories");
+        }
+
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
         const newRecipe = new Recipe({
+            userId,
             recipeName,
             category: categoryId,
             image: imagePath,
@@ -233,6 +326,105 @@ const addRecipe = async (req, res) => {
 
         req.flash("error", "Error adding recipe.");
         return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/recipes");
+    }
+};
+
+const getEditRecipe = async (req, res) => {
+    const locals = { title: "Edit Recipe | RecipeNest" };
+    const { id } = req.params;
+
+    try {
+        const recipe = await Recipe.findById(id);
+        if (!recipe) {
+            req.flash("error", `Recipe not found.`);
+            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+        }
+
+        const categories = await Category.find()
+            .select("categoryName")
+            .lean();
+
+        recipe.ingredients = recipe.ingredients.join("\n");
+        recipe.steps = recipe.steps.join("\n");           
+
+        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
+        if (!token) {
+            req.flash("error", `Token not found.`);
+            return res.status(HttpStatuscode.FORBIDDEN).redirect("/recipes");
+        }
+
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
+        if (recipe.userId.toString() !== userId) {
+            req.flash("error", `Unauthorized access.`);
+            return res.status(HttpStatuscode.FORBIDDEN).redirect("/recipes");
+        }
+
+        return res.status(HttpStatuscode.OK).render("users/editRecipe", {
+            locals,
+            recipe,
+            categories,
+            layout: "layouts/mainLayout",
+        });
+    } catch (error) {
+        console.error("Error fetching edit recipe:", error);
+
+        req.flash("error", "Error fetching edit recipe.");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).redirect("/recipes");
+    }
+};
+
+const editRecipe = async (req, res) => {
+    const { id } = req.params;
+    const { recipeName, category, preparationTime, servingSize, ingredients, steps } = req.body;
+
+    try {
+        const isExistingRecipe = await Recipe.findById(id, "image");
+        if (!isExistingRecipe) {
+            req.flash("error", "Recipe not found.");
+            return res.status(HttpStatuscode.NOT_FOUND).json({ success: false });
+        }
+
+        const isExistingRecipeName = await Recipe.findOne({
+            _id: { $ne: id },
+            recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
+        });
+        if (isExistingRecipeName) {
+            req.flash("Recipe name already exists.");
+            return res.status(HttpStatuscode.BAD_REQUEST).json({ success: false });
+        }
+
+        let updatedImagePath = isExistingRecipe.image;
+        if (req.file) {
+            updatedImagePath = req.file.filename;
+        }
+
+        const updatedRecipe = await Recipe.findByIdAndUpdate(
+            id,
+            {
+                recipeName,
+                category,
+                image: updatedImagePath,
+                preparationTime,
+                servingSize,
+                ingredients: ingredients.split("\n"),
+                steps: steps.split("\n"),
+            },
+            { new: true },
+        );
+        if (!updatedRecipe) {
+            req.flash("error", `Failed to update recipe.`);
+            return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
+        }
+
+        req.flash("success", `${recipeName} updated successfully.`);
+        return res.status(HttpStatuscode.OK).json({ success: true });
+    } catch (error) {
+        console.error("Error updating the recipe:", error);
+
+        req.flash("error", "An error occurred while updating the recipe. Please try again.");
+        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({ success: false });
     }
 };
 
@@ -369,8 +561,12 @@ module.exports = {
     userLogout,
     getAddCategory,
     addCategory,
+    getEditCategory,
+    editCategory,
     getAddRecipe,
     addRecipe,
+    getEditRecipe,
+    editRecipe,
     addFavouriteRecipes,
     getFavouriteRecipes,
     processSendEmail,

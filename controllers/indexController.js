@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
@@ -174,14 +176,14 @@ const getRecipeDetails = async (req, res) => {
 
     try {
         const recipe = await Recipe.findById(id)
-            .select("_id category recipeName image preparationTime servingSize ingredients steps")
+            .select("userId _id category recipeName image preparationTime servingSize ingredients steps")
             .populate({
                 path: "category",
                 select: "categoryName",
             })
             .lean();
 
-        const similarRecipes = await Recipe.find({ category: recipe.category })
+        const similarRecipes = await Recipe.find({ _id: { $ne: id }, category: recipe.category })
             .select("_id category recipeName image preparationTime")
             .populate({
                 path: "category",
@@ -190,10 +192,27 @@ const getRecipeDetails = async (req, res) => {
             .limit(3)
             .lean();
 
+        let userId = null;
+
+        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
+        if (token) {
+            try {
+                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+                userId = decodedToken.userId;
+            } catch (error) {
+                if (error.name === "TokenExpiredError") {
+                    console.warn("Token is expired, proceeding as an unauthenticated user.");
+                } else {
+                    console.error("Error verifying token:", error);
+                }
+            }
+        }
+
         return res.status(HttpStatuscode.OK).render("recipeDetails", {
             locals,
             recipe,
             similarRecipes,
+            userId,
             layout: "layouts/mainLayout",
         });
     } catch (error) {
@@ -210,19 +229,36 @@ const getCategories = async (req, res) => {
 
     try {
         const categories = await Category.find()
-            .select("categoryName image description")
+            .select("userId categoryName image description")
             .lean();
+
+        let userId = null;
+
+        const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
+        if (token) {
+            try {
+                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+                userId = decodedToken.userId;
+            } catch (error) {
+                if (error.name === "TokenExpiredError") {
+                    console.warn("Token is expired, proceeding as an unauthenticated user.");
+                } else {
+                    console.error("Error verifying token:", error);
+                }
+            }
+        }
 
         return res.status(HttpStatuscode.OK).render("categories", {
             locals,
             categories,
+            userId,
             layout: "layouts/mainLayout",
         });
     } catch (error) {
         console.error("Error fetching category:", error);
 
         req.flash("error", "Error fetching category.");
-        return res.redirect(HttpStatuscode.INTERNAL_SERVER_ERROR, "/");
+        return res.redirect("/");
     }
 };
 
