@@ -622,9 +622,13 @@ const editRecipe = async (req, res) => {
 const addFavouriteRecipes = async (req, res) => {
     const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-        return res.status(HttpStatuscode.UNAUTHORIZED).json({
-            ok: false,
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
             message: "Please login to add recipe to favourites.",
+            status: HttpStatuscode.UNAUTHORIZED,
+            isJson: true,
         });
     }
 
@@ -633,14 +637,22 @@ const addFavouriteRecipes = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
             if (err.name === "TokenExpiredError") {
-                return res.status(HttpStatuscode.UNAUTHORIZED).json({
-                    ok: false,
+                return showFlashMessages({
+                    req,
+                    res,
+                    type: "error",
                     message: "Token has expired.",
+                    status: HttpStatuscode.UNAUTHORIZED,
+                    isJson: true,
                 });
             } else if (err.name === "JsonWebTokenError") {
-                return res.status(HttpStatuscode.UNAUTHORIZED).json({
-                    ok: false,
+                return showFlashMessages({
+                    req,
+                    res,
+                    type: "error",
                     message: "Token is invalid.",
+                    status: HttpStatuscode.UNAUTHORIZED,
+                    isJson: true,
                 });
             }
         }
@@ -657,16 +669,24 @@ const addFavouriteRecipes = async (req, res) => {
 
         const user = await User.findById(userId).select("favourites");
         if (!user) {
-            return res.status(HttpStatuscode.NOT_FOUND).json({
-                ok: false,
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
                 message: "User not found.",
+                status: HttpStatuscode.NOT_FOUND,
+                isJson: true,
             });
         }
 
         if (user.favourites.includes(recipeId)) {
-            return res.status(HttpStatuscode.BAD_REQUEST).json({
-                ok: false,
+            return showFlashMessages({
+                req,
+                res,
+                type: "error",
                 message: "Recipe is already in your favorites.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
             });
         }
 
@@ -676,15 +696,24 @@ const addFavouriteRecipes = async (req, res) => {
             { new: true },
         );
 
-        return res.status(HttpStatuscode.OK).json({
-            ok: true,
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
             message: "Recipe added to favorites successfully!",
+            status: HttpStatuscode.OK,
+            isJson: true,
+            success: true,
         });
     } catch (error) {
         console.error("Failed to add recipe to favorites:", error);
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({
-            ok: false,
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
             message: "Failed to add recipe to favorites.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            isJson: true,
         });
     }
 };
@@ -734,16 +763,24 @@ const processSendEmail = async (req, res) => {
     try {
         await sendEmail(name, email, message);
 
-        res.status(HttpStatuscode.OK).json({
-            success: true,
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
             message: "Email sent successfully.",
+            status: HttpStatuscode.OK,
+            isJson: true,
+            success: true,
         });
     } catch (error) {
         console.error("Failed to send email:", error);
-
-        return res.status(HttpStatuscode.INTERNAL_SERVER_ERROR).json({
-            success: false,
-            message: 'Failed to send email.',
+        return showFlashMessages({
+            req,
+            res,
+            type: "error",
+            message: "Failed to send email.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            isJson: true,
         });
     }
 };
