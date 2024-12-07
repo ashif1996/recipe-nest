@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 // Schema for storing Recipe
 const recipeSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: "Category",

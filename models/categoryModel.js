@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 // Schema for storing Recipe categories
 const categorySchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+    },
     categoryName: {
         type: String,
         required: true,
