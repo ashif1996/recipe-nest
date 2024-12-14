@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const servingSize = document.getElementById("servingSize").value.trim();
         const ingredients = document.getElementById("ingredients").value.trim();
         const steps = document.getElementById("steps").value.trim();
-        const isEditMode = document.getElementById("isEditMode").value === "true";
+        const isEditModeElement = document.getElementById("isEditMode");
+        const isEditMode = isEditModeElement ? isEditModeElement.value === "true" : false;
 
         clearErrors();
 

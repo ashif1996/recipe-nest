@@ -29,7 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const categoryName = document.getElementById("categoryName").value.trim();
         const description = document.getElementById("description").value.trim();
         const image = document.getElementById("image").files[0];
-        const isEditMode = document.getElementById("isEditMode").value === "true";
+        const isEditModeElement = document.getElementById("isEditMode");
+        const isEditMode = isEditModeElement ? isEditModeElement.value === "true" : false;
 
         let isValid = true;
 
