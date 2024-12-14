@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
+    const editProfileForm = document.getElementById("editProfileForm");
 
     const displayErrors = (fieldId, message) => {
         const errorElement = document.getElementById(`${fieldId}Error`);
@@ -61,8 +62,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const firstName = document.getElementById("firstName").value.trim();
         const lastName = document.getElementById("lastName").value.trim();
         const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
+        const passwordField = document.getElementById("password");
+        const confirmPasswordField = document.getElementById("confirmPassword");
+        const isEditMode = document.getElementById("isEditMode").value === "true";
 
         let isValid = true;
 
@@ -98,23 +100,30 @@ document.addEventListener("DOMContentLoaded", () => {
             isValid = false;
         }
 
-        if (password === '') {
-            displayErrors("password", "Password is required.");
-            isValid = false;
-        } else if (password.length < 8) {
-            displayErrors("password", "Password must be at least 8 characters long.");
-            isValid = false;
-        }
-
-        if (confirmPassword === '') {
-            displayErrors("confirmPassword", "Please confirm your password.");
-            isValid = false;
-        } else if (confirmPassword.length < 8) {
-            displayErrors("confirmPassword", "Password must be at least 8 characters long.");
-            isValid = false;
-        } else if (password !== confirmPassword) {
-            displayErrors("confirmPassword", "Passwords do not match.");
-            isValid = false;
+        if (!isEditMode) {
+            if (passwordField && confirmPasswordField) {
+                const password = passwordField.value;
+                const confirmPassword = confirmPasswordField.value;
+    
+                if (!password) {
+                    displayErrors("password", "Password is required.");
+                    isValid = false;
+                } else if (password.length < 8) {
+                    displayErrors("password", "Password must be at least 8 characters long.");
+                    isValid = false;
+                }
+    
+                if (!confirmPassword) {
+                    displayErrors("confirmPassword", "Please confirm your password.");
+                    isValid = false;
+                } else if (confirmPassword.length < 8) {
+                    displayErrors("confirmPassword", "Password must be at least 8 characters long.");
+                    isValid = false;
+                } else if (password !== confirmPassword) {
+                    displayErrors("confirmPassword", "Passwords do not match.");
+                    isValid = false;
+                }
+            }
         }
 
         return isValid;
@@ -138,6 +147,42 @@ document.addEventListener("DOMContentLoaded", () => {
             const isValidateSignupForm = validateSignupForm();
             if (isValidateSignupForm) {
                 signupForm.submit();
+            }
+        });
+    }
+
+    if (editProfileForm) {
+        editProfileForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const isValidateSignupForm = validateSignupForm();
+            if (!isValidateSignupForm) {
+                return;
+            }
+
+            const formData = new FormData(editProfileForm);
+            const jsonData = JSON.stringify(Object.fromEntries(formData));
+            const userId = editProfileForm.action.split("/").pop();
+
+            try {
+                const response = await fetch(`/users/user-profile/edit/${userId}`, {
+                    method: "PUT",
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: jsonData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    window.location.href = "/users/user-profile";
+                } else {
+                    window.location.href = "/users/user-profile/edit";
+                }
+            } catch (error) {
+                console.error("Error submitting form:", error);
+                window.location.href = "/users/user-profile";
             }
         });
     }
