@@ -13,6 +13,7 @@ const nocache = require("nocache");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const expressLayouts = require("express-ejs-layouts");
+const { cleanupExpiredOtps } = require("./utils/otpUtils");
 
 const app = express();
 
@@ -91,6 +92,8 @@ app.use((err, req, res, next) => {
         layout: "layouts/errorLayout",
     });
 });
+
+cleanupExpiredOtps();
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
