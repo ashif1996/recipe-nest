@@ -32,6 +32,18 @@ const userSchema = new Schema({
         required: true,
         minLength: 8,
     },
+    role: {
+        type: String,
+        default: "User",
+    },
+    categoriesAdded: {
+        type: Number,
+        default: 0,
+    },
+    recipesAdded: {
+        type: Number,
+        default: 0,
+    },
     favourites: [
         {
             type: Schema.Types.ObjectId,
