@@ -65,7 +65,6 @@ const getHome = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Error fetching home page.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/users/login",
@@ -173,7 +172,6 @@ const getRecipes = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Error fetching recipes.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/",
@@ -188,21 +186,34 @@ const getRecipeDetails = async (req, res) => {
 
     try {
         const recipe = await Recipe.findById(id)
-            .select("userId _id category recipeName image preparationTime servingSize ingredients steps")
+            .select(`
+                _id
+                userId
+                category
+                recipeName
+                image
+                preparationTime
+                servingSize
+                ingredients
+                steps
+            `)
             .populate({
                 path: "category",
                 select: "categoryName",
             })
             .lean();
 
-        const similarRecipes = await Recipe.find({ _id: { $ne: id }, category: recipe.category })
-            .select("_id category recipeName image preparationTime")
-            .populate({
-                path: "category",
-                select: "categoryName",
-            })
-            .limit(3)
-            .lean();
+        const similarRecipes = await Recipe.find({
+            _id: { $ne: id },
+            category: recipe.category,
+        })
+        .select("_id category recipeName image preparationTime")
+        .populate({
+            path: "category",
+            select: "categoryName",
+        })
+        .limit(3)
+        .lean();
 
         const userId = await fetchUserId(req);
 
@@ -218,7 +229,6 @@ const getRecipeDetails = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Error fetching recipe details.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/",
@@ -248,7 +258,6 @@ const getCategories = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Error fetching category.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/",
