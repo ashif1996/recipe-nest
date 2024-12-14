@@ -11,7 +11,6 @@ const authenticateJWT = (req, res, next) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Access denied. Please log in.",
             status: httpStatusCode.UNAUTHORIZED,
             redirectUrl: "/users/login",
@@ -24,7 +23,6 @@ const authenticateJWT = (req, res, next) => {
                 return showFlashMessages({
                     req,
                     res,
-                    type: "error",
                     message: "Session has expired. Please log in again.",
                     status: httpStatusCode.UNAUTHORIZED,
                     redirectUrl: "/users/login",
@@ -34,7 +32,6 @@ const authenticateJWT = (req, res, next) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Invalid token. Please log in again.",
                 status: httpStatusCode.UNAUTHORIZED,
                 redirectUrl: "/users/login",
