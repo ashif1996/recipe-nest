@@ -24,12 +24,14 @@ const userLogin = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
+            .select("_id email firstName lastName password")
+            .lean();
+
         if (!user) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "User not found. Please try again.",
                 status: HttpStatuscode.NOT_FOUND,
                 redirectUrl: "/users/login",
@@ -41,7 +43,6 @@ const userLogin = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Password does not match.",
                 status: HttpStatuscode.UNAUTHORIZED,
                 redirectUrl: "/users/login",
@@ -55,9 +56,7 @@ const userLogin = async (req, res) => {
             lastName: user.lastName,
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: 3600,
-        });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 });
 
         res.cookie("authToken", token, {
             httpOnly: true,
@@ -79,7 +78,6 @@ const userLogin = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/users/login",
@@ -101,12 +99,11 @@ const userSignup = async (req, res) => {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
 
     try {
-        const isExistingUser = await User.findOne({ email });
+        const isExistingUser = await User.exists({ email });
         if (isExistingUser) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Email already taken.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/signup",
@@ -117,22 +114,19 @@ const userSignup = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Passwords do not match.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/signup",
             });
         }
 
-        const newUser = new User({
+        await User.create({
             firstName,
             lastName,
             email,
             password,
             favourites: [],
         });
-
-        await newUser.save();
 
         return showFlashMessages({
             req,
@@ -147,7 +141,6 @@ const userSignup = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/users/signup",
@@ -173,6 +166,114 @@ const userLogout = (req, res) => {
     });
 };
 
+const getUserProfile = async (req, res) => {
+    const locals = { title: "User Profile | RecipeNest" };
+
+    try {
+        const userId = await fetchUserId(req);
+        const user = await User.findById(userId)
+            .select("_id firstName lastName email role categoriesAdded recipesAdded favourites createdAt")
+            .lean();
+
+        return res.status(HttpStatuscode.OK).render("users/profile", {
+            locals,
+            user,
+            layout: "layouts/mainLayout",
+        });
+    } catch (error) {
+        console.error("An internal error occurred:", error);
+        return showFlashMessages({
+            req,
+            res,
+            message: "An unexpected error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/login",
+        });
+    }
+};
+
+const getEditUserProfile = async (req, res) => {
+    const locals = { title: "Edit User Profile | RecipeNest" };
+    const { id } = req.params;
+
+    try {
+        const user = await User.findById(id)
+            .select("_id firstName lastName email")
+            .lean();
+
+        if (!user) {
+            return showFlashMessages({
+                req,
+                res,
+                message: "User not found.",
+                status: HttpStatuscode.NOT_FOUND,
+                redirectUrl: "/users/user-profile",
+            });
+        }
+
+        return res.status(HttpStatuscode.OK).render("users/editProfile", {
+            locals,
+            user,
+            layout: "layouts/mainLayout",
+        });        
+    } catch (error) {
+        console.error("An internal error occurred:", error);
+        return showFlashMessages({
+            req,
+            res,
+            message: "An unexpected error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            redirectUrl: "/users/user-profile",
+        });
+    }
+};
+
+const editUserProfile = async (req, res) => {
+    const { firstName, lastName, email } = req.body;
+    const { id } = req.params;
+
+    try {
+        const isEmailTaken = await User.exists({
+            _id: { $ne: id },
+            email,
+        });
+
+        if (isEmailTaken) {
+            return showFlashMessages({
+                req,
+                res,
+                message: "Email is already in use by another account.",
+                status: HttpStatuscode.BAD_REQUEST,
+                isJson: true,
+            });
+        }
+
+        await User.findByIdAndUpdate(
+            id,
+            { firstName, lastName, email },
+        );
+
+        return showFlashMessages({
+            req,
+            res,
+            type: "success",
+            message: `Profile updated successfully.`,
+            status: HttpStatuscode.OK,
+            isJson: true,
+            success: true,
+        });
+    } catch (error) {
+        console.error("An internal error occurred:", error);
+        return showFlashMessages({
+            req,
+            res,
+            message: "An unexpected error occurred. Please try again later.",
+            status: HttpStatuscode.INTERNAL_SERVER_ERROR,
+            isJson: true,
+        });
+    }
+};
+
 // Renders the page to add categoies
 const getAddCategory = (req, res) => {
     const locals = { title: "Add Recipe Category | RecipeNest" };
@@ -187,14 +288,14 @@ const addCategory = async (req, res) => {
     const { categoryName, description } = req.body;
 
     try {
-        const isCategoryNameExist = await Category.findOne({
+        const isCategoryNameExist = await Category.exists({
             categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
         });
+        
         if (isCategoryNameExist) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Category name already exists.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/add-category",
@@ -205,7 +306,6 @@ const addCategory = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Image upload failed or no file uploaded.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/add-category",
@@ -214,13 +314,20 @@ const addCategory = async (req, res) => {
 
         const imagePath = req.file.filename;
 
-        const newCategory = new Category({
+        await Category.create({
             categoryName,
             description,
             image: imagePath,
         });
 
-        await newCategory.save();
+        const token = isTokenPresent(req, "/users/add-category");
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decodedToken.userId;
+
+        await User.updateOne(
+            { _id: userId },
+            { $inc: { categoriesAdded: 1 } },
+        );
 
         return showFlashMessages({
             req,
@@ -235,7 +342,6 @@ const addCategory = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/categories",
@@ -248,12 +354,14 @@ const getEditCategory = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const category = await Category.findById(id);
+        const category = await Category.findById(id)
+            .select("_id userId categoryName description image")
+            .lean();
+
         if (!category) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Category not found.",
                 status: HttpStatuscode.NOT_FOUND,
                 redirectUrl: "/categories",
@@ -268,7 +376,6 @@ const getEditCategory = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Unauthorized access.",
                 status: HttpStatuscode.FORBIDDEN,
                 redirectUrl: "/categories",
@@ -285,7 +392,6 @@ const getEditCategory = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/categories",
@@ -303,22 +409,21 @@ const editCategory = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Category not found.",
                 status: HttpStatuscode.BAD_REQUEST,
                 isJson: true,
             });
         }
 
-        const isCategoryNameExist = await Category.findOne({
+        const isCategoryNameExist = await Category.exists({
             _id: { $ne: id },
             categoryName: { $regex: new RegExp(`^${categoryName}$`, "i") },
         });
+
         if (isCategoryNameExist) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Category with this name already exists.",
                 status: HttpStatuscode.BAD_REQUEST,
                 isJson: true,
@@ -330,21 +435,10 @@ const editCategory = async (req, res) => {
             updatedImagePath = req.file.filename;
         }
 
-        const updatedCategory = await Category.findByIdAndUpdate(
+        await Category.findByIdAndUpdate(
             id,
             { categoryName, description, image: updatedImagePath },
-            { new: true },
         );
-        if (!updatedCategory) {
-            return showFlashMessages({
-                req,
-                res,
-                type: "error",
-                message: "Failed to update category.",
-                status: HttpStatuscode.INTERNAL_SERVER_ERROR,
-                isJson: true,
-            });
-        }
 
         return showFlashMessages({
             req,
@@ -360,7 +454,6 @@ const editCategory = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred while updating the category. Please try again.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             isJson: true,
@@ -387,7 +480,6 @@ const getAddRecipe = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/users/login",
@@ -400,26 +492,28 @@ const addRecipe = async (req, res) => {
     const { recipeName, category, preparationTime, servingSize, ingredients, steps } = req.body;
 
     try {
-        const isRecipeNameExist = await Recipe.findOne({ 
+        const isRecipeNameExist = await Recipe.exists({
             recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
         });
+
         if (isRecipeNameExist) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Recipe name already exists.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/add-recipe",
             });
         }
 
-        const categoryId = await Category.findOne({ categoryName: category }).select("_id");
+        const categoryId = await Category.findOne({ categoryName: category })
+            .select("_id")
+            .lean();
+
         if (!categoryId) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Invalid category selected.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/add-recipe",
@@ -430,7 +524,6 @@ const addRecipe = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Image upload failed or no file uploaded.",
                 status: HttpStatuscode.BAD_REQUEST,
                 redirectUrl: "/users/add-recipe",
@@ -443,7 +536,7 @@ const addRecipe = async (req, res) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
 
-        const newRecipe = new Recipe({
+        await Recipe.create({
             userId,
             recipeName,
             category: categoryId,
@@ -454,7 +547,10 @@ const addRecipe = async (req, res) => {
             steps: steps.split("\n"),
         });
 
-        await newRecipe.save();
+        await User.updateOne(
+            { _id: userId },
+            { $inc: { recipesAdded: 1 } },
+        );
 
         return showFlashMessages({
             req,
@@ -469,7 +565,6 @@ const addRecipe = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/recipes",
@@ -482,12 +577,14 @@ const getEditRecipe = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const recipe = await Recipe.findById(id);
+        const recipe = await Recipe.findById(id)
+            .select("_id userId recipeName image preparationTime servingSize ingredients steps")
+            .lean();
+
         if (!recipe) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Recipe not found.",
                 status: HttpStatuscode.BAD_REQUEST,
                 isJson: true,
@@ -509,7 +606,6 @@ const getEditRecipe = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Unauthorized access.",
                 status: HttpStatuscode.FORBIDDEN,
                 redirectUrl: "/recipes",
@@ -527,7 +623,6 @@ const getEditRecipe = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/recipes",
@@ -545,22 +640,21 @@ const editRecipe = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Recipe not found.",
                 status: HttpStatuscode.NOT_FOUND,
                 isJson: true,
             });
         }
 
-        const isExistingRecipeName = await Recipe.findOne({
+        const isExistingRecipeName = await Recipe.exists({
             _id: { $ne: id },
             recipeName: { $regex: new RegExp(`^${recipeName}$`, "i") },
         });
+
         if (isExistingRecipeName) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Recipe name already exists.",
                 status: HttpStatuscode.BAD_REQUEST,
                 isJson: true,
@@ -572,7 +666,7 @@ const editRecipe = async (req, res) => {
             updatedImagePath = req.file.filename;
         }
 
-        const updatedRecipe = await Recipe.findByIdAndUpdate(
+        await Recipe.findByIdAndUpdate(
             id,
             {
                 recipeName,
@@ -583,18 +677,7 @@ const editRecipe = async (req, res) => {
                 ingredients: ingredients.split("\n"),
                 steps: steps.split("\n"),
             },
-            { new: true },
         );
-        if (!updatedRecipe) {
-            return showFlashMessages({
-                req,
-                res,
-                type: "error",
-                message: "Failed to update recipe.",
-                status: HttpStatuscode.INTERNAL_SERVER_ERROR,
-                isJson: true,
-            });
-        }
 
         return showFlashMessages({
             req,
@@ -610,7 +693,6 @@ const editRecipe = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred while updating the recipe. Please try again.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             isJson: true,
@@ -625,7 +707,6 @@ const addFavouriteRecipes = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Please login to add recipe to favourites.",
             status: HttpStatuscode.UNAUTHORIZED,
             isJson: true,
@@ -640,7 +721,6 @@ const addFavouriteRecipes = async (req, res) => {
                 return showFlashMessages({
                     req,
                     res,
-                    type: "error",
                     message: "Token has expired.",
                     status: HttpStatuscode.UNAUTHORIZED,
                     isJson: true,
@@ -649,7 +729,6 @@ const addFavouriteRecipes = async (req, res) => {
                 return showFlashMessages({
                     req,
                     res,
-                    type: "error",
                     message: "Token is invalid.",
                     status: HttpStatuscode.UNAUTHORIZED,
                     isJson: true,
@@ -667,12 +746,13 @@ const addFavouriteRecipes = async (req, res) => {
     try {
         const { recipeId } = req.body;
 
-        const user = await User.findById(userId).select("favourites");
+        const user = await User.findById(userId)
+            .select("favourites");
+
         if (!user) {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "User not found.",
                 status: HttpStatuscode.NOT_FOUND,
                 isJson: true,
@@ -683,7 +763,6 @@ const addFavouriteRecipes = async (req, res) => {
             return showFlashMessages({
                 req,
                 res,
-                type: "error",
                 message: "Recipe is already in your favorites.",
                 status: HttpStatuscode.BAD_REQUEST,
                 isJson: true,
@@ -693,7 +772,6 @@ const addFavouriteRecipes = async (req, res) => {
         await User.findOneAndUpdate(
             { _id: userId },
             { $addToSet: { favourites: recipeId } },
-            { new: true },
         );
 
         return showFlashMessages({
@@ -710,7 +788,6 @@ const addFavouriteRecipes = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Failed to add recipe to favorites.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             isJson: true,
@@ -748,7 +825,6 @@ const getFavouriteRecipes = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "An error occurred. Please try again later.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             redirectUrl: "/recipes",
@@ -777,7 +853,6 @@ const processSendEmail = async (req, res) => {
         return showFlashMessages({
             req,
             res,
-            type: "error",
             message: "Failed to send email.",
             status: HttpStatuscode.INTERNAL_SERVER_ERROR,
             isJson: true,
@@ -791,6 +866,9 @@ module.exports = {
     getUserSignup,
     userSignup,
     userLogout,
+    getUserProfile,
+    getEditUserProfile,
+    editUserProfile,
     getAddCategory,
     addCategory,
     getEditCategory,
