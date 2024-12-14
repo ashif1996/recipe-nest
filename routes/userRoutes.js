@@ -15,6 +15,12 @@ router.route("/signup")
 
 router.get('/logout', userController.userLogout);
 
+router.get("/user-profile", authenticateJWT, userController.getUserProfile);
+
+router.route("/user-profile/edit/:id")
+    .get(authenticateJWT, userController.getEditUserProfile)
+    .put(authenticateJWT, userController.editUserProfile);
+
 router.get('/favourite-recipes', authenticateJWT, userController.getFavouriteRecipes);
 
 router.post("/add-favourites", userController.addFavouriteRecipes);
