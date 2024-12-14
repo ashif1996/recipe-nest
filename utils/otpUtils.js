@@ -10,12 +10,11 @@ const storeOtp = async (email, otp) => {
     try {
         await OTP.deleteMany({ email });
 
-        const newOtp = new OTP({
+        await OTP.create({
             email,
             otp,
-            expiresAt: new Date(Date.now() + 1 * 60 * 1000),
+            expiresAt: new Date(Date.now() + 2 * 60 * 1000),
         });
-        await newOtp.save();
     } catch (error) {
         console.error("Error storing the OTP:", error);
         throw new Error("Failed to store OTP.");
@@ -44,8 +43,9 @@ const sendOtp = async (email, otp) => {
 const verifyOtp = async (email, otp) => {
     try {
         const latestOtp = await OTP.findOne({ email })
-            .sort({ expiresAt: -1 })
-            .exec();
+            .select("email otp expiresAt")
+            .sort({ expiresAt: -1 });
+
         if (!latestOtp) {
             return { isVerified: false, reason: "notFound" };
         }

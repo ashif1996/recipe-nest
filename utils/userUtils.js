@@ -1,10 +1,17 @@
 const jwt = require("jsonwebtoken");
+const HttpStatuscode = require("./httpStatusCode");
+const showFlashMessages = require("./messageUtils");
 
 const isTokenPresent = (req, redirectUrl) => {
     const token = req.cookies.authToken || req.header("Authorization")?.replace("Bearer ", "");
     if (!token) {
-        req.flash("error", `Token not found.`);
-        return res.status(HttpStatuscode.FORBIDDEN).redirect(redirectUrl);
+        return showFlashMessages({
+            req,
+            res,
+            message: "Token not found.",
+            status: HttpStatuscode.FORBIDDEN,
+            redirectUrl,
+        });
     }
 
     return token;
