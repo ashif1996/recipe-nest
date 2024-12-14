@@ -1,0 +1,74 @@
+<link rel="stylesheet" href="/css/user.css">
+
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item"><a href="/users/profile" style="color: #007bff;">Profile</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="flash-messages mb-4">
+        <% if (successMessage && successMessage.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (errorMessage && errorMessage.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+    </div>
+    <div class="main-container">
+        <div class="profile-container">
+            <h2>Edit Profile</h2>
+            <form id="editProfileForm" action="/users/user-profile/edit/<%= user._id %>" method="post" class="mt-4">
+                <input type="hidden" name="_method" value="put">
+                <input type="hidden" id="isEditMode" name="isEditMode" value="true">
+                <input type="hidden" name="userId" value="<%= user._id %>">
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="firstName" 
+                        name="firstName" 
+                        value="<%= user.firstName %>"
+                    >
+                    <span id="firstNameError" class="error-message" style="margin-top: 5px;"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="lastName" 
+                        name="lastName" 
+                        value="<%= user.lastName %>" 
+                    >
+                    <span id="lastNameError" class="error-message" style="margin-top: 5px;"></span>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        value="<%= user.email %>" 
+                    >
+                    <span id="emailError" class="error-message" style="margin-top: 5px;"></span>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="/users/user-profile" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/js/userAuth.js"></script>

@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="/css/user.css">
+
+<div class="container mt-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="color: #007bff;"><i class="fa fa-home" style="margin-right: 5px; color: #007bff;"></i>Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Profile</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="flash-messages mb-4">
+        <% if (successMessage && successMessage.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (errorMessage && errorMessage.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+    </div>
+    <div class="main-container mt-5">
+        <div class="profile-container" style="margin-bottom: 100px;">
+            <section>
+                <h2>Your Profile</h2>
+                <ul>
+                    <li><strong>First Name:</strong> <%= user.firstName %></li>
+                    <li><strong>Last Name:</strong> <%= user.lastName %></li>
+                    <li><strong>Email:</strong> <%= user.email %></li>
+                    <li><strong>Role:</strong> <%= user.role %></li>
+                    <li><strong>Total Categories Added:</strong> <%= user.categoriesAdded %></li>
+                    <li><strong>Total Recipes Added:</strong> <%= user.recipesAdded %></li>
+                    <li><strong>Total favourite Recipes:</strong> <%= user.favourites.length %></li>
+                    <li><strong>Account Created At:</strong> <%= user.createdAt.toDateString() %></li>
+                </ul>
+            </section>
+            <a href="/users/user-profile/edit/<%= user._id %>" class="line_btn">Edit Profile</a>
+        </div>
+    </div>
+</div>
