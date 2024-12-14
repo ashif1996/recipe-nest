@@ -208,3 +208,93 @@
 .already-account .already-account-underline:hover {
     text-decoration: underline !important;
 }
+
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* Adjust as needed */
+}
+
+.profile-container {
+    max-width: 600px;
+    width: 100%;
+    padding: 2rem;
+    background: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+section {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+section h2 {
+    font-size: 1.8rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+section h2::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #007bff;
+    border-radius: 2px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul li {
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+ul li strong {
+    font-weight: 600;
+    color: #555;
+}
+
+ul li svg {
+    color: #007bff;
+}
+
+/* Empty State Message */
+section p {
+    font-size: 1.2rem;
+    color: #888;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -6,7 +6,9 @@
 }
 .flash-messages {
   width: 100%; /* Match the width of the column */
-  margin-bottom: 20px; /* Add some space below */
+  max-width: 600px; /* Limit the width */
+  margin: 0 auto 20px auto; /* Center horizontally and add bottom margin */
+  text-align: center; /* Center text inside */
 }
 
 .alert {
