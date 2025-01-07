@@ -77,7 +77,7 @@ app.use("/otp", otpRoutes);
 
 app.use((req, res, next) => {
     const locals = { title: "404 | Page Not Found" };
-    return res.status(404).render("404", {
+    res.status(404).render("404", {
         locals,
         layout: "layouts/errorLayout",
     });
@@ -87,7 +87,7 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
 
     const locals = { title: "500 | Internal Server Error" };
-    return res.status(500).render("serverError", {
+    res.status(500).render("serverError", {
         locals,
         layout: "layouts/errorLayout",
     });
