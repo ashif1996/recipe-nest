@@ -13,7 +13,7 @@ const sendEmail = require("../utils/emailUtils");
 // Renders the login page for users
 const getUserLogin = (req, res) => {
     const locals = { title: "User Login | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("users/login", {
+    res.status(HttpStatuscode.OK).render("users/login", {
         locals,
         layout: "layouts/authLayout",
     });
@@ -69,7 +69,6 @@ const userLogin = async (req, res) => {
             req,
             res,
             type: "success",
-            message: "Login successful!",
             status: HttpStatuscode.OK,
             redirectUrl: "/",
         });
@@ -88,7 +87,7 @@ const userLogin = async (req, res) => {
 // Renders the signup page for new users
 const getUserSignup = (req, res) => {
     const locals = { title: "User SignUp | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("users/signup", {
+    res.status(HttpStatuscode.OK).render("users/signup", {
         locals,
         layout: "layouts/authLayout",
     });
@@ -172,10 +171,20 @@ const getUserProfile = async (req, res) => {
     try {
         const userId = await fetchUserId(req);
         const user = await User.findById(userId)
-            .select("_id firstName lastName email role categoriesAdded recipesAdded favourites createdAt")
+            .select(`
+                _id
+                firstName
+                lastName
+                email
+                role
+                categoriesAdded
+                recipesAdded
+                favourites
+                createdAt
+            `)
             .lean();
 
-        return res.status(HttpStatuscode.OK).render("users/profile", {
+        res.status(HttpStatuscode.OK).render("users/profile", {
             locals,
             user,
             layout: "layouts/mainLayout",
@@ -211,7 +220,7 @@ const getEditUserProfile = async (req, res) => {
             });
         }
 
-        return res.status(HttpStatuscode.OK).render("users/editProfile", {
+        res.status(HttpStatuscode.OK).render("users/editProfile", {
             locals,
             user,
             layout: "layouts/mainLayout",
@@ -277,7 +286,7 @@ const editUserProfile = async (req, res) => {
 // Renders the page to add categoies
 const getAddCategory = (req, res) => {
     const locals = { title: "Add Recipe Category | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("users/addCategory", {
+    res.status(HttpStatuscode.OK).render("users/addCategory", {
         locals,
         layout: "layouts/mainLayout",
     });
@@ -382,7 +391,7 @@ const getEditCategory = async (req, res) => {
             });
         }
 
-        return res.status(HttpStatuscode.OK).render("users/editCategory", {
+        res.status(HttpStatuscode.OK).render("users/editCategory", {
             locals,
             category,
             layout: "layouts/mainLayout",
@@ -470,7 +479,7 @@ const getAddRecipe = async (req, res) => {
             .select("categoryName")
             .lean();
 
-        return res.status(HttpStatuscode.OK).render("users/addRecipe", {
+        res.status(HttpStatuscode.OK).render("users/addRecipe", {
             locals,
             categories,
             layout: "layouts/mainLayout",
@@ -612,7 +621,7 @@ const getEditRecipe = async (req, res) => {
             });
         }
 
-        return res.status(HttpStatuscode.OK).render("users/editRecipe", {
+        res.status(HttpStatuscode.OK).render("users/editRecipe", {
             locals,
             recipe,
             categories,
@@ -815,7 +824,7 @@ const getFavouriteRecipes = async (req, res) => {
 
         const favourites = user ? user.favourites : [];
 
-        return res.status(HttpStatuscode.OK).render("users/favourites", {
+        res.status(HttpStatuscode.OK).render("users/favourites", {
             locals,
             favourites,
             layout: "layouts/mainLayout",
