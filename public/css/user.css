@@ -12,6 +12,12 @@
     width: 100%; /* Ensure it spans the full width of its parent container */
     box-sizing: border-box; /* Ensure padding doesn’t overflow */
 }
+
+.success-message {
+    color: green;
+    font-size: 14px;
+}
+
 .flash-messages {
     width: 100%; /* Match the width of the column */
     margin-bottom: 20px; /* Add some space below */
