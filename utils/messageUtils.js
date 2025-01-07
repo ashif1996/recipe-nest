@@ -2,7 +2,7 @@ const showFlashMessages = ({
     req,
     res,
     type = "error",
-    message,
+    message = null,
     status,
     redirectUrl = null,
     isJson = false,
