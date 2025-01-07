@@ -1,5 +1,3 @@
-const jwt = require("jsonwebtoken");
-
 const Category = require("../models/categoryModel");
 const Recipe = require("../models/recipeModel");
 
@@ -54,7 +52,7 @@ const getHome = async (req, res) => {
             },
         ]);
 
-        return res.status(HttpStatuscode.OK).render("index", {
+        res.status(HttpStatuscode.OK).render("index", {
             locals,
             categories,
             recipes,
@@ -75,7 +73,7 @@ const getHome = async (req, res) => {
 // Render the contact page
 const getContact = (req, res) => {
     const locals = { title: "Contact Us | RecipeNest" };
-    return res.status(HttpStatuscode.OK).render("contact", {
+    res.status(HttpStatuscode.OK).render("contact", {
         locals,
         layout: "layouts/mainLayout",
     });
@@ -155,7 +153,7 @@ const getRecipes = async (req, res) => {
         const totalRecipes = await Recipe.countDocuments(filter);
         const totalPages = Math.ceil(totalRecipes / limit);
 
-        return res.status(HttpStatuscode.OK).render("recipes", {
+        res.status(HttpStatuscode.OK).render("recipes", {
             locals,
             categoryFilter,
             searchFilter,
@@ -217,7 +215,7 @@ const getRecipeDetails = async (req, res) => {
 
         const userId = await fetchUserId(req);
 
-        return res.status(HttpStatuscode.OK).render("recipeDetails", {
+        res.status(HttpStatuscode.OK).render("recipeDetails", {
             locals,
             recipe,
             similarRecipes,
@@ -247,7 +245,7 @@ const getCategories = async (req, res) => {
 
         const userId = await fetchUserId(req);
 
-        return res.status(HttpStatuscode.OK).render("categories", {
+        res.status(HttpStatuscode.OK).render("categories", {
             locals,
             categories,
             userId,
