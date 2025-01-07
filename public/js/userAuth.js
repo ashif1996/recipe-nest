@@ -64,7 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const email = document.getElementById("email").value.trim();
         const passwordField = document.getElementById("password");
         const confirmPasswordField = document.getElementById("confirmPassword");
-        const isEditMode = document.getElementById("isEditMode").value === "true";
+        const isEditModeElement = document.getElementById("isEditMode");
+        const isEditMode = isEditModeElement ? isEditModeElement.value === "true" : false;
 
         let isValid = true;
 
